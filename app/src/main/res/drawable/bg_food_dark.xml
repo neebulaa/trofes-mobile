@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item>
+        <color android:color="#202020"/> <!-- Dark background fallback -->
+    </item>
+    <!-- Dark Overlay Gradient -->
+    <item>
+        <shape>
+            <gradient
+                android:startColor="#B3000000"
+                android:endColor="#B3000000"
+                android:angle="90"/>
+        </shape>
+    </item>
+</layer-list>

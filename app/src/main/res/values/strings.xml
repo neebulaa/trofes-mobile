@@ -1,0 +1,109 @@
+<resources>
+    <string name="app_name">Trofes</string>
+    <string name="hero_badge">Selamat datang di Trofes</string>
+    <string name="hero_title_raw">Teman andalanmu di dapur untuk setiap hidangan</string>
+    <string name="hero_subtitle">Misi kami adalah menjadi teman andalanmu di dapur, membantu kamu menyiapkan hidangan yang lebih mudah, lebih cerdas, dan lebih lezat sesuai dengan kebutuhanmu setiap hari.</string>
+    <string name="cta_button">Coba Sekarang</string>
+
+    <string name="recommendation_title">Rekomendasi Makanan yang Cerdas Membuat Hidangan Lebih Mudah</string>
+    <string name="recommendation_desc">Trofes menjadi asisten gizi pintar yang memberi rekomendasi makanan sesuai kebutuhanmu. Dengan saran yang tepat dan mudah dipahami, kami membantu membuat setiap hidangan lebih sehat.</string>
+    <string name="stats_recipes_label">Jumlah Resep</string>
+    <string name="stats_recipes_value">13K +</string>
+    <string name="stats_ingredients_label">Jumlah Bahan Dikenali</string>
+    <string name="stats_ingredients_value">10K +</string>
+    <string name="contact_button">Hubungi Kami Sekarang</string>
+    <string name="nav_home">Beranda</string>
+    <string name="nav_for_you">Untukmu</string>
+
+    <!-- Added strings for onboarding profile layout -->
+    <string name="onboarding_bg_desc">Background onboarding</string>
+    <string name="onboarding_title">Mau dikenal orang lebih lagi?</string>
+    <string name="onboarding_subtitle">Isi profilmu sekarang juga</string>
+    <string name="label_full_name">Full Name</string>
+    <string name="hint_full_name">Masukan Nama...</string>
+    <string name="label_phone">No HP</string>
+    <string name="phone_prefix">+62</string>
+    <string name="hint_phone">800-0000-0000</string>
+    <string name="label_gender">Jenis Kelamin</string>
+    <string name="prompt_gender">Pilih Jenis Kelamin</string>
+    <string name="label_birthdate">Tanggal Lahir</string>
+    <string name="hint_birthdate">Select date</string>
+    <string name="btn_continue">Lanjut</string>
+    <string name="btn_skip">Lewati</string>
+    <string name="footer_no_account">Belum mempunyai akun?</string>
+    <string name="footer_sign_up">Sign Up</string>
+    <string name="logo_desc">Logo Trofes</string>
+
+    <!-- New strings for activity_recipes.xml -->
+    <string name="recipes_greeting">Hi WW3</string>
+    <string name="recipes_subtitle">Let\'s eat</string>
+    <string name="recipe_not_found">Recipe not found</string>
+    <string name="try_another_keyword">Try another keyword or category</string>
+    <string name="profile">Profile</string>
+    <string name="search">Search...</string>
+
+    <!-- Strings for Customize page -->
+    <string name="back">Back</string>
+    <string name="custom">Custom</string>
+    <string name="search_recipes">Search Recipes</string>
+    <string name="customize_desc">Customize your search to optimized what you want.</string>
+
+    <string name="calories">Calories (±)</string>
+    <string name="protein">Protein (±)</string>
+    <string name="fat">Fat (±)</string>
+    <string name="sodium">Sodium (±)</string>
+    <string name="carbs">Karbohidrat</string>
+
+    <string name="calories_hint">Calories</string>
+    <string name="protein_hint">Protein</string>
+    <string name="fat_hint">Fat</string>
+    <string name="sodium_hint">Sodium</string>
+    <string name="carbs_hint">Karbohidrat</string>
+
+    <string name="select_allergies">Select Allergies</string>
+    <string name="select_dietary_preferences">Select Dietary Preferences</string>
+    <string name="select_ingredients">Select Ingredients</string>
+
+    <string name="type_allergy">Type allergy...</string>
+    <string name="type_dietary_preference">Type dietary preference...</string>
+    <string name="type_ingredients">type Ingredients you have...</string>
+
+    <string name="remove_all">Remove All</string>
+    <string name="reset">Reset</string>
+
+    <string name="unit_kcal">kcal</string>
+    <string name="unit_gr">gr</string>
+    <string name="unit_mg">mg</string>
+
+    <!-- ...existing code... -->
+    <string name="guide_title">Ayo <b><font color='#22B14C'>Belajar</font></b> Bersama</string>
+    <string name="guide_subtitle">Temukan berbagai tutorial yang telah kami siapkan untuk membantu Anda memahami setiap langkah dengan lebih mudah.</string>
+    <string name="search_hint">Search...</string>
+    <string name="filter">Filter</string>
+    <string name="guide_image">Gambar artikel panduan</string>
+    <string name="guide_article_title">Tentang Vitamin</string>
+    <string name="guide_article_desc">Vitamin adalah senyawa penting yang dibutuhkan tubuh dalam jumlah kecil ...</string>
+    <string name="guide_article_date">18/10/25</string>
+
+    <!-- Strings for Camera page -->
+    <string name="upload">Upload</string>
+    <string name="capture">Capture</string>
+    <string name="flash">Flash</string>
+
+    <!-- Strings for Recipe Detail page -->
+    <string name="detail">Detail</string>
+    <string name="time">Time</string>
+    <string name="tags">Tags</string>
+    <string name="servings">Servings</string>
+    <string name="measured_ingredients">Measured Ingredients</string>
+    <string name="instructions">Instructions</string>
+    <string name="step_1">Step 1</string>
+    <string name="step_2">Step 2</string>
+    <string name="step_3">Step 3</string>
+    <string name="video_tutorial">Video Tutorial</string>
+
+    <string name="placeholder_500kcal">500kcal</string>
+    <string name="placeholder_36m">36m</string>
+    <string name="placeholder_halal">Halal</string>
+    <string name="placeholder_2">2</string>
+</resources>

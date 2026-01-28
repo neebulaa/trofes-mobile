@@ -1,0 +1,24 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="360dp"
+    android:height="65dp"
+    android:viewportWidth="360"
+    android:viewportHeight="65">
+
+    <!--
+      NOTE:
+      Hindari nilai negatif pada pathData (mis. Q180,-45 ...) karena pada beberapa device/versi
+      bisa menyebabkan InflateException saat load vector.
+      Ini versi aman yang membuat lengkungan ke atas tanpa koordinat negatif.
+    -->
+    <path
+        android:fillColor="@android:color/white"
+        android:pathData="M0,20
+                          Q0,0 20,0
+                          L125,0
+                          Q180,0 180,0
+                          Q180,20 235,0
+                          L340,0
+                          Q360,0 360,20
+                          L360,65
+                          L0,65 Z" />
+</vector>

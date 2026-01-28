@@ -1,0 +1,11 @@
+<resources>
+    <string name="contact_us">Contact Us</string>
+    <string name="send">Send</string>
+    <string name="write_something">Write something…</string>
+
+    <!-- Optional (preview texts) -->
+    <string name="trofes_bot">Trofes Bot</string>
+    <string name="chat_quick_masukkan">Masukkan</string>
+    <string name="chat_quick_complain">Komplain Resep</string>
+    <string name="chat_quick_tech">Masalah Teknis</string>
+</resources>

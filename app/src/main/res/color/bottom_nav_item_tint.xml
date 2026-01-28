@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:color="@color/trofes_green_header" android:state_checked="true" />
+    <item android:color="@color/trofes_muted" />
+</selector>
+

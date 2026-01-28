@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item>
+        <shape android:shape="rectangle">
+            <solid android:color="@android:color/transparent" />
+        </shape>
+    </item>
+
+    <!-- cornerLength: 62dp, strokeThickness: 7dp, color: red -->
+
+    <!-- Top-left -->
+    <item android:gravity="top|start" android:left="0dp" android:top="0dp">
+        <shape android:shape="rectangle">
+            <size android:width="24dp" android:height="2dp" />
+            <solid android:color="#F44336" />
+        </shape>
+    </item>
+    <item android:gravity="top|start" android:left="0dp" android:top="0dp">
+        <shape android:shape="rectangle">
+            <size android:width="2dp" android:height="24dp" />
+            <solid android:color="#F44336" />
+        </shape>
+    </item>
+
+    <!-- Top-right -->
+    <item android:gravity="top|end" android:right="0dp" android:top="0dp">
+        <shape android:shape="rectangle">
+            <size android:width="24dp" android:height="2dp" />
+            <solid android:color="#F44336" />
+        </shape>
+    </item>
+    <item android:gravity="top|end" android:right="0dp" android:top="0dp">
+        <shape android:shape="rectangle">
+            <size android:width="2dp" android:height="24dp" />
+            <solid android:color="#F44336" />
+        </shape>
+    </item>
+
+    <!-- Bottom-left -->
+    <item android:gravity="bottom|start" android:left="0dp" android:bottom="0dp">
+        <shape android:shape="rectangle">
+            <size android:width="24dp" android:height="2dp" />
+            <solid android:color="#F44336" />
+        </shape>
+    </item>
+    <item android:gravity="bottom|start" android:left="0dp" android:bottom="0dp">
+        <shape android:shape="rectangle">
+            <size android:width="2dp" android:height="24dp" />
+            <solid android:color="#F44336" />
+        </shape>
+    </item>
+
+    <!-- Bottom-right -->
+    <item android:gravity="bottom|end" android:right="0dp" android:bottom="0dp">
+        <shape android:shape="rectangle">
+            <size android:width="24dp" android:height="2dp" />
+            <solid android:color="#F44336" />
+        </shape>
+    </item>
+    <item android:gravity="bottom|end" android:right="0dp" android:bottom="0dp">
+        <shape android:shape="rectangle">
+            <size android:width="2dp" android:height="24dp" />
+            <solid android:color="#F44336" />
+        </shape>
+    </item>
+
+</layer-list>

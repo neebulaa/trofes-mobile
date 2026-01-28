@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="412dp"
+    android:height="260dp"
+    android:viewportWidth="412"
+    android:viewportHeight="260">
+
+    <!-- Curved green header background (bottom-left & bottom-right rounded/curved) -->
+    <path
+        android:fillColor="#4CAF50"
+        android:pathData="M0,0H412V200C412,200 310,260 206,260C102,260 0,200 0,200Z"/>
+</vector>

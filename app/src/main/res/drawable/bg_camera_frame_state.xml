@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- error/not focused -> red -->
+    <item android:state_activated="true" android:drawable="@drawable/bg_camera_frame_red" />
+    <!-- focused/ready -> green -->
+    <item android:state_selected="true" android:drawable="@drawable/bg_camera_frame_green" />
+    <!-- default -> white -->
+    <item android:drawable="@drawable/bg_camera_frame_white" />
+
+</selector>

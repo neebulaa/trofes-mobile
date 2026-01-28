@@ -1,0 +1,441 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <!-- Background image -->
+    <ImageView
+        android:id="@+id/ivBackground"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:contentDescription="@null"
+        android:scaleType="centerCrop"
+        android:src="@mipmap/bg_onboarding_profile_foreground"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <androidx.core.widget.NestedScrollView
+        android:id="@+id/scroll"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:fillViewport="true"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <!-- Card container centered -->
+            <androidx.cardview.widget.CardView
+                android:id="@+id/cardPreferences"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="24dp"
+                android:layout_marginEnd="24dp"
+                android:layout_marginVertical="24dp"
+                app:cardCornerRadius="22dp"
+                app:cardElevation="10dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_bias="0.5">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:paddingStart="18dp"
+                    android:paddingEnd="18dp"
+                    android:paddingTop="64dp"
+                    android:paddingBottom="18dp">
+
+                    <TextView
+                        android:id="@+id/tvTitle"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:text="@string/onboarding_mobile_title"
+                        android:textColor="#1A1A1A"
+                        android:textSize="18sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/tvSubtitle"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="6dp"
+                        android:gravity="center"
+                        android:text="@string/onboarding_mobile_subtitle"
+                        android:textColor="#7B7B7B"
+                        android:textSize="13sp" />
+
+                    <!-- 3x3 grid manual layout -->
+                    <LinearLayout
+                        android:id="@+id/gridPreferences"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="18dp"
+                        android:orientation="vertical">
+
+                        <!-- Row 1 -->
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:baselineAligned="false">
+
+                            <!-- Item 1: Halal -->
+                            <LinearLayout
+                                android:id="@+id/tileHalal"
+                                android:layout_width="0dp"
+                                android:layout_height="110dp"
+                                android:layout_margin="6dp"
+                                android:layout_weight="1"
+                                android:background="@drawable/bg_preference_tile_ripple"
+                                android:clickable="true"
+                                android:focusable="true"
+                                android:gravity="center"
+                                android:orientation="vertical"
+                                android:padding="8dp">
+
+                                <ImageView
+                                    android:layout_width="45dp"
+                                    android:layout_height="45dp"
+                                    android:src="@mipmap/ic_halal_foreground" />
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="8dp"
+                                    android:layout_marginBottom="8dp"
+                                    android:gravity="center"
+                                    android:text="Halal"
+                                    android:textColor="#333333"
+                                    android:textSize="10sp"
+                                    android:textStyle="bold" />
+                            </LinearLayout>
+
+                            <!-- Item 2: Lactose Intolerance -->
+                            <LinearLayout
+                                android:id="@+id/tileLactose"
+                                android:layout_width="0dp"
+                                android:layout_height="110dp"
+                                android:layout_margin="6dp"
+                                android:layout_weight="1"
+                                android:background="@drawable/bg_preference_tile_ripple"
+                                android:clickable="true"
+                                android:focusable="true"
+                                android:gravity="center"
+                                android:orientation="vertical"
+                                android:padding="8dp">
+
+                                <ImageView
+                                    android:layout_width="40dp"
+                                    android:layout_height="40dp"
+                                    android:src="@mipmap/ic_lactose_foreground" />
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="8dp"
+                                    android:gravity="center"
+                                    android:text="Lactose\nIntolerance"
+                                    android:textColor="#333333"
+                                    android:textSize="10sp"
+                                    android:textStyle="bold" />
+                            </LinearLayout>
+
+                            <!-- Item 3: Keto / Low Carb -->
+                            <LinearLayout
+                                android:id="@+id/tileKeto"
+                                android:layout_width="0dp"
+                                android:layout_height="110dp"
+                                android:layout_margin="6dp"
+                                android:layout_weight="1"
+                                android:background="@drawable/bg_preference_tile_ripple"
+                                android:clickable="true"
+                                android:focusable="true"
+                                android:gravity="center"
+                                android:orientation="vertical"
+                                android:padding="8dp">
+
+                                <ImageView
+                                    android:layout_width="50dp"
+                                    android:layout_height="45dp"
+                                    android:src="@mipmap/ic_low_carb_foreground" />
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="8dp"
+                                    android:gravity="center"
+                                    android:text="Keto /\nLow Carb"
+                                    android:textColor="#333333"
+                                    android:textSize="10sp"
+                                    android:textStyle="bold" />
+                            </LinearLayout>
+                        </LinearLayout>
+
+                        <!-- Row 2 -->
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:baselineAligned="false">
+
+                            <!-- Item 4: Weight Loss -->
+                            <LinearLayout
+                                android:id="@+id/tileWeightLoss"
+                                android:layout_width="0dp"
+                                android:layout_height="110dp"
+                                android:layout_margin="6dp"
+                                android:layout_weight="1"
+                                android:background="@drawable/bg_preference_tile_ripple"
+                                android:clickable="true"
+                                android:focusable="true"
+                                android:gravity="center"
+                                android:orientation="vertical"
+                                android:padding="8dp">
+
+                                <ImageView
+                                    android:layout_width="40dp"
+                                    android:layout_height="40dp"
+                                    android:src="@mipmap/ic_weight_loss_foreground" />
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="8dp"
+                                    android:gravity="center"
+                                    android:text="Weight\nLoss"
+                                    android:textColor="#333333"
+                                    android:textSize="10sp"
+                                    android:textStyle="bold" />
+                            </LinearLayout>
+
+                            <!-- Item 5: High Protein -->
+                            <LinearLayout
+                                android:id="@+id/tileHighProtein"
+                                android:layout_width="0dp"
+                                android:layout_height="110dp"
+                                android:layout_margin="6dp"
+                                android:layout_weight="1"
+                                android:background="@drawable/bg_preference_tile_ripple"
+                                android:clickable="true"
+                                android:focusable="true"
+                                android:gravity="center"
+                                android:orientation="vertical"
+                                android:padding="8dp">
+
+                                <ImageView
+                                    android:layout_width="40dp"
+                                    android:layout_height="40dp"
+                                    android:src="@mipmap/ic_high_protein_foreground" />
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="8dp"
+                                    android:gravity="center"
+                                    android:text="High\nProtein"
+                                    android:textColor="#333333"
+                                    android:textSize="10sp"
+                                    android:textStyle="bold" />
+                            </LinearLayout>
+
+                            <!-- Item 6: Gluten-Free -->
+                            <LinearLayout
+                                android:id="@+id/tileGlutenFree"
+                                android:layout_width="0dp"
+                                android:layout_height="110dp"
+                                android:layout_margin="6dp"
+                                android:layout_weight="1"
+                                android:background="@drawable/bg_preference_tile_ripple"
+                                android:clickable="true"
+                                android:focusable="true"
+                                android:gravity="center"
+                                android:orientation="vertical"
+                                android:padding="8dp">
+
+                                <ImageView
+                                    android:layout_width="40dp"
+                                    android:layout_height="40dp"
+                                    android:src="@mipmap/ic_gluten_free_foreground" />
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="8dp"
+                                    android:gravity="center"
+                                    android:text="Gluten\nFree"
+                                    android:textColor="#333333"
+                                    android:textSize="10sp"
+                                    android:textStyle="bold" />
+                            </LinearLayout>
+                        </LinearLayout>
+
+                        <!-- Row 3 -->
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:baselineAligned="false">
+
+                            <!-- Item 7: Dairy-Free -->
+                            <LinearLayout
+                                android:id="@+id/tileDairyFree"
+                                android:layout_width="0dp"
+                                android:layout_height="110dp"
+                                android:layout_margin="6dp"
+                                android:layout_weight="1"
+                                android:background="@drawable/bg_preference_tile_ripple"
+                                android:clickable="true"
+                                android:focusable="true"
+                                android:gravity="center"
+                                android:orientation="vertical"
+                                android:padding="8dp">
+
+                                <ImageView
+                                    android:layout_width="40dp"
+                                    android:layout_height="40dp"
+                                    android:src="@mipmap/ic_dairy_free_foreground" />
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="8dp"
+                                    android:gravity="center"
+                                    android:text="Dairy\nFree"
+                                    android:textColor="#333333"
+                                    android:textSize="10sp"
+                                    android:textStyle="bold" />
+                            </LinearLayout>
+
+                            <!-- Item 8: Spicy -->
+                            <LinearLayout
+                                android:id="@+id/tileSpicy"
+                                android:layout_width="0dp"
+                                android:layout_height="110dp"
+                                android:layout_margin="6dp"
+                                android:layout_weight="1"
+                                android:background="@drawable/bg_preference_tile_ripple"
+                                android:clickable="true"
+                                android:focusable="true"
+                                android:gravity="center"
+                                android:orientation="vertical"
+                                android:padding="8dp">
+
+                                <ImageView
+                                    android:layout_width="40dp"
+                                    android:layout_height="40dp"
+                                    android:src="@mipmap/ic_spicy_foreground" />
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="8dp"
+                                    android:gravity="center"
+                                    android:text="Spicy"
+                                    android:textColor="#333333"
+                                    android:textSize="10sp"
+                                    android:textStyle="bold" />
+                            </LinearLayout>
+
+                            <!-- Item 9: No Fried Food -->
+                            <LinearLayout
+                                android:id="@+id/tileNoFried"
+                                android:layout_width="0dp"
+                                android:layout_height="110dp"
+                                android:layout_margin="6dp"
+                                android:layout_weight="1"
+                                android:background="@drawable/bg_preference_tile_ripple"
+                                android:clickable="true"
+                                android:focusable="true"
+                                android:gravity="center"
+                                android:orientation="vertical"
+                                android:padding="8dp">
+
+                                <ImageView
+                                    android:layout_width="40dp"
+                                    android:layout_height="40dp"
+                                    android:src="@mipmap/ic_no_fried_foreground" />
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="8dp"
+                                    android:gravity="center"
+                                    android:text="No Fried\nFood"
+                                    android:textColor="#333333"
+                                    android:textSize="10sp"
+                                    android:textStyle="bold" />
+                            </LinearLayout>
+                        </LinearLayout>
+
+                    </LinearLayout>
+
+                    <Button
+                        android:id="@+id/btnContinue"
+                        android:layout_width="match_parent"
+                        android:layout_height="52dp"
+                        android:layout_marginTop="18dp"
+                        android:backgroundTint="@color/trofes_green"
+                        android:text="@string/onboarding_mobile_continue"
+                        android:textAllCaps="false"
+                        android:textColor="@android:color/white"
+                        android:textSize="16sp"
+                        android:textStyle="bold" />
+
+                    <Button
+                        android:id="@+id/btnSkip"
+                        android:layout_width="match_parent"
+                        android:layout_height="50dp"
+                        android:layout_marginTop="1dp"
+                        android:backgroundTint="@color/white"
+                        android:text="@string/onboarding_mobile_skip"
+                        android:textAllCaps="false"
+                        android:textColor="#1A1A1A"
+                        android:textSize="16sp"
+                        app:iconGravity="textStart"
+                        app:iconPadding="8dp"
+                        app:iconTint="@null"
+                        app:strokeColor="#DDDDDD"
+                        app:strokeWidth="1dp" />
+
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <!-- Floating logo (icon nanti kamu ganti) -->
+            <androidx.cardview.widget.CardView
+                android:id="@+id/logoCard"
+                android:layout_width="96dp"
+                android:layout_height="96dp"
+                android:translationY="40dp"
+                app:cardCornerRadius="48dp"
+                app:cardElevation="14dp"
+                app:layout_constraintBottom_toTopOf="@id/cardPreferences"
+                app:layout_constraintEnd_toEndOf="@id/cardPreferences"
+                app:layout_constraintStart_toStartOf="@id/cardPreferences">
+
+                <ImageView
+                    android:id="@+id/ivLogo"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:contentDescription="@null"
+                    android:padding="2dp"
+                    android:src="@mipmap/ic_launcher" />
+
+            </androidx.cardview.widget.CardView>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </androidx.core.widget.NestedScrollView>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

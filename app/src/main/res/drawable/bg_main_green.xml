@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt"
+    android:width="412dp"
+    android:height="915dp"
+    android:viewportWidth="412"
+    android:viewportHeight="915">
+
+    <!-- Latar Belakang Putih -->
+    <path
+        android:pathData="M0,0h412v915h-412z"
+        android:fillColor="#FFFFFF"/>
+
+    <!-- Bentuk Hijau (Posisi Dinaikkan) -->
+    <!-- Sebelumnya V820..Q..0,820. Sekarang V750..Q..0,750 -->
+    <path
+        android:pathData="M0,0 H412 V750 Q206,850 0,750 Z">
+        <aapt:attr name="android:fillColor">
+            <gradient
+                android:centerX="206"
+                android:centerY="400"
+                android:gradientRadius="600"
+                android:type="radial">
+                <item android:offset="0.0" android:color="#FF8FDF5E"/>
+                <item android:offset="1.0" android:color="#FF388E3C"/>
+            </gradient>
+        </aapt:attr>
+    </path>
+</vector>

@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Placeholder strings for compose-related content descriptions -->
+    <string name="cd_recommendation_like">Like</string>
+</resources>

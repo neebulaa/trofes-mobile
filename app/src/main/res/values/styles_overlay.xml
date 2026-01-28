@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Base alias required by resource linking in some setups -->
+    <style name="ShapeAppearanceOverlay" />
+
+    <!-- Root overlay (kadang direferensikan sebagai parent oleh generated/IDE) -->
+    <style name="ShapeAppearanceOverlay.Trofes" parent="ShapeAppearanceOverlay" />
+
+    <!-- Overlay untuk bikin ShapeableImageView jadi lingkaran -->
+    <style name="ShapeAppearanceOverlay.Trofes.Circle" parent="ShapeAppearanceOverlay.Trofes">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">50%</item>
+    </style>
+</resources>

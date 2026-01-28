@@ -1,0 +1,7 @@
+<resources>
+    <string name="onboarding_mobile_title">Ada Preferensi makanan?</string>
+    <string name="onboarding_mobile_subtitle">Tentukan tipe apa kamu sebagai pecinta makanan</string>
+    <string name="onboarding_mobile_continue">Lanjut</string>
+    <string name="onboarding_mobile_skip">Lewati</string>
+</resources>
+

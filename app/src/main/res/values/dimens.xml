@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Spacer to prevent content from being hidden behind bottom nav/FAB -->
+    <dimen name="recipes_bottom_spacer">110dp</dimen>
+    <dimen name="recipes_bottom_spacer_empty">110dp</dimen>
+</resources>

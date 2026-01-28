@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="purple_200">#FFBB86FC</color>
+    <color name="purple_500">#2fb248</color>
+    <color name="purple_700">#299b3f</color>
+    <color name="teal_200">#FF03DAC5</color>
+    <color name="teal_700">#FF018786</color>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+    
+    <!-- Trofes Brand Colors -->
+    <color name="primary_trofes">#70D583</color>
+    <color name="trofes_green">#2fb248</color>
+    <color name="trofes_green_dark">#299b3f</color>
+    <color name="trofes_green_header">#1A5E20</color> <!-- Darker green for header -->
+    <color name="trofes_mint">#effff2</color>
+    <color name="trofes_text">#1f1f1f</color>
+    <color name="trofes_muted">#888888</color>
+    <color name="trofes_line">#e1e1e1</color>
+    <color name="trofes_input_bg">#FFFFFF</color>
+    <color name="trofes_bg_overlay">#B3000000</color>
+    <color name="gray">#A2A2A2</color>
+</resources>
