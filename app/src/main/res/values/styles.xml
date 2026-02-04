@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Intentionally left minimal.
+         NOTE: ShapeAppearanceOverlay.Trofes.Circle sudah didefinisikan di styles_overlay.xml.
+         Jangan duplikasi di sini agar tidak terjadi Duplicate resources saat build.
+    -->
+</resources>

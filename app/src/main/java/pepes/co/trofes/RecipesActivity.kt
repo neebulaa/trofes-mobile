@@ -20,10 +20,14 @@ import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.google.android.material.button.MaterialButton
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import pepes.co.trofes.auth.AuthSession
 import pepes.co.trofes.ui.CategoryChipsRow
 
 class RecipesActivity : AppCompatActivity() {
+
+    private lateinit var authSession: AuthSession
 
     private lateinit var adapter: RecommendationAdapter
 
@@ -45,20 +49,46 @@ class RecipesActivity : AppCompatActivity() {
         enableEdgeToEdge()
         setContentView(R.layout.activity_recipes)
 
+        authSession = AuthSession(this)
+
         setupTopActions()
         setupBottomNav()
         setupCategoryChipsCompose()
         setupGrid()
         setupSearch()
 
+        syncHeaderAuthState()
+
         // load pertama
         loadNextPage()
     }
 
+    override fun onResume() {
+        super.onResume()
+        syncHeaderAuthState()
+    }
+
     private fun setupTopActions() {
-        findViewById<ImageView?>(R.id.ivProfile)?.setOnClickListener {
-            startActivity(Intent(this, SigninActivity::class.java))
+        findViewById<MaterialButton?>(R.id.btnLogin)?.setOnClickListener {
+            startActivity(SigninIntentFactory.forHome(this))
         }
+
+        findViewById<ImageView?>(R.id.ivProfile)?.setOnClickListener {
+            if (authSession.isLoggedIn()) {
+                startActivity(Intent(this, ProfileActivity::class.java))
+            } else {
+                startActivity(SigninIntentFactory.forHome(this))
+            }
+        }
+    }
+
+    private fun syncHeaderAuthState() {
+        val btnLogin = findViewById<MaterialButton?>(R.id.btnLogin)
+        val ivProfile = findViewById<ImageView?>(R.id.ivProfile)
+
+        val loggedIn = authSession.isLoggedIn()
+        btnLogin?.visibility = if (loggedIn) View.GONE else View.VISIBLE
+        ivProfile?.visibility = if (loggedIn) View.VISIBLE else View.GONE
     }
 
     private fun setupBottomNav() {
@@ -140,6 +170,10 @@ class RecipesActivity : AppCompatActivity() {
 
         adapter = RecommendationAdapter(
             onItemClick = { item ->
+                if (!authSession.isLoggedIn()) {
+                    startActivity(SigninIntentFactory.forRecipeDetail(this, item))
+                    return@RecommendationAdapter
+                }
                 startActivity(RecipeDetailComposeActivity.newIntent(this, item))
             },
             itemLayoutRes = R.layout.item_recommendation_grid,
@@ -223,6 +257,7 @@ class RecipesActivity : AppCompatActivity() {
                 tagText = if (cat == "Halal") "Halal" else cat.split(" ").first(),
                 category = cat,
                 imageRes = images[id % images.size],
+                firstDietaryPreference = (if (cat == "Halal") "Halal" else cat.split(" ").first()),
             )
         }
     }

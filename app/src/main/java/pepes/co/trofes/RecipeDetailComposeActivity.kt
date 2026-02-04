@@ -22,8 +22,9 @@ class RecipeDetailComposeActivity : ComponentActivity() {
             timeText = intent.getStringExtra(EXTRA_TIME).orEmpty(),
             tagText = intent.getStringExtra(EXTRA_TAG).orEmpty(),
             category = intent.getStringExtra(EXTRA_CATEGORY).orEmpty(),
-            imageRes = intent.getIntExtra(EXTRA_IMAGE_RES, 0),
+            imageRes = intent.getIntExtra(EXTRA_IMAGE_RES, 0).takeIf { it != 0 },
             isLiked = false,
+            firstDietaryPreference = "All",
         )
 
         val detail = RecipeDetail.fromRecommendation(item)
@@ -57,7 +58,7 @@ class RecipeDetailComposeActivity : ComponentActivity() {
                 putExtra(EXTRA_TIME, item.timeText)
                 putExtra(EXTRA_TAG, item.tagText)
                 putExtra(EXTRA_CATEGORY, item.category)
-                putExtra(EXTRA_IMAGE_RES, item.imageRes)
+                putExtra(EXTRA_IMAGE_RES, item.imageRes ?: 0)
             }
         }
     }

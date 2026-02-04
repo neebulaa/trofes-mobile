@@ -9,6 +9,7 @@ import android.widget.TextView
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import coil.load
 import java.util.Locale
 
 class RecommendationAdapter(
@@ -53,14 +54,21 @@ class RecommendationAdapter(
         private val tvRating: TextView = itemView.findViewById(R.id.tvRecRating)
 
         fun bind(item: RecommendationItem, isTopLiked: Boolean) {
-            ivImage.setImageResource(item.imageRes)
+            val placeholderRes = item.imageRes ?: R.drawable.berita_1_
+            ivImage.load(item.imageUrl) {
+                placeholder(placeholderRes)
+                error(placeholderRes)
+                crossfade(true)
+            }
+
             tvTitle.text = item.title
 
             // likes yang ditampilkan mengikuti state like
             val shownLikes = item.likesCount + if (item.isLiked) 1 else 0
             tvLikes.text = shownLikes.toString()
 
-            tvCalories.text = item.caloriesText
+            // ikon daun = total bahan (total_ingredient)
+            tvCalories.text = item.ingredientsCount.toString()
             tvTime.text = item.timeText
             tvTag.text = item.tagText
 

@@ -11,6 +11,11 @@ data class RecommendationItem(
     val timeText: String,
     val tagText: String,
     val category: String,
-    @DrawableRes val imageRes: Int,
+    // Total bahan (dari API: total_ingredient). Dipakai di icon daun.
+    val ingredientsCount: Int = 0,
+    @DrawableRes val imageRes: Int? = null,
+    val imageUrl: String? = null,
     val isLiked: Boolean = false,
+    // Chip hijau (dietary preference pertama). Default untuk item dummy.
+    val firstDietaryPreference: String = "Recipe",
 )

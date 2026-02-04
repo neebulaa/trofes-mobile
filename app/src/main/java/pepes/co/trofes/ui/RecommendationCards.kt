@@ -39,6 +39,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import pepes.co.trofes.R
 
@@ -51,6 +52,8 @@ data class RecommendationCardUi(
     val rating: String,
     val likesCount: Int,
     val caloriesText: String,
+    // Total bahan (dari API: total_ingredient). Dipakai di icon daun.
+    val ingredientsCount: Int = 0,
     val timeText: String,
     val tagText: String,
     val tagColor: Color,
@@ -144,6 +147,8 @@ private fun RecommendationCard(
                 style = MaterialTheme.typography.bodyMedium,
                 fontWeight = FontWeight.Bold,
                 color = Color(0xFF1F1F1F),
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis,
             )
 
             Row(
@@ -185,6 +190,23 @@ private fun RecommendationCard(
                 Spacer(modifier = Modifier.width(6.dp))
                 Text(
                     text = item.caloriesText,
+                    style = MaterialTheme.typography.labelSmall,
+                    fontWeight = FontWeight.Bold,
+                    color = Color(0xFF1F1F1F),
+                )
+
+                Spacer(modifier = Modifier.width(10.dp))
+
+                // Total ingredients (icon daun)
+                Icon(
+                    painter = painterResource(id = R.drawable.ic_leaf),
+                    contentDescription = null,
+                    tint = Color(0xFF1F1F1F),
+                    modifier = Modifier.size(14.dp),
+                )
+                Spacer(modifier = Modifier.width(6.dp))
+                Text(
+                    text = item.ingredientsCount.toString(),
                     style = MaterialTheme.typography.labelSmall,
                     fontWeight = FontWeight.Bold,
                     color = Color(0xFF1F1F1F),

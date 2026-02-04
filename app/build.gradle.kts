@@ -1,3 +1,5 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -18,15 +20,37 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        // ------- BASE_URL configurable -------
+        // Kamu bisa set di `local.properties`:
+        // TROFES_BASE_URL=http://192.168.1.10:8000/
+        val localProps = Properties()
+        val localPropsFile = rootProject.file("local.properties")
+        if (localPropsFile.exists()) {
+            localPropsFile.inputStream().use { localProps.load(it) }
+        }
+        val localBaseUrl = (localProps.getProperty("TROFES_BASE_URL") ?: "").trim()
+
+        // Default (Emulator)
+        val defaultBaseUrl = "http://10.0.2.2:8000/"
+        val finalBaseUrl = if (localBaseUrl.isNotBlank()) localBaseUrl else defaultBaseUrl
+
+        buildConfigField("String", "BASE_URL", "\"$finalBaseUrl\"")
     }
 
     buildTypes {
+        debug {
+            // Tidak perlu hardcode lagi di sini karena sudah ambil dari local.properties
+            // Kalau mau override khusus debug, bisa isi ulang buildConfigField di sini.
+        }
         release {
             isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            // Release: pakai juga BASE_URL dari defaultConfig (local.properties) agar konsisten.
+            // Jika kamu butuh URL beda khusus release, override di sini.
         }
     }
     compileOptions {
@@ -39,10 +63,11 @@ android {
 
     buildFeatures {
         compose = true
+        buildConfig = true
     }
 
     composeOptions {
-        kotlinCompilerExtensionVersion = libs.versions.composeCompiler.get().toString()
+        kotlinCompilerExtensionVersion = libs.versions.composeCompiler.get()
     }
 }
 
@@ -76,4 +101,18 @@ dependencies {
     implementation("androidx.camera:camera-camera2:$cameraxVersion")
     implementation("androidx.camera:camera-lifecycle:$cameraxVersion")
     implementation("androidx.camera:camera-view:$cameraxVersion")
+
+    // Networking (Retrofit)
+    implementation("com.squareup.retrofit2:retrofit:2.11.0")
+    implementation("com.squareup.retrofit2:converter-gson:2.11.0")
+    implementation("com.squareup.okhttp3:logging-interceptor:4.12.0")
+
+    // ViewModel + Coroutines scope
+    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.8.7")
+
+    // Image loading (URL -> ImageView)
+    implementation("io.coil-kt:coil:2.6.0")
+
+    // Google Sign-In
+    implementation("com.google.android.gms:play-services-auth:21.2.0")
 }

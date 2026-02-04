@@ -4,6 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.util.Log
 import android.view.KeyEvent
 import android.view.View
 import android.view.inputmethod.EditorInfo
@@ -15,11 +16,17 @@ import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.ui.platform.ComposeView
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import kotlinx.coroutines.launch
+import pepes.co.trofes.auth.AuthSession
+import pepes.co.trofes.home.HomeViewModel
 import pepes.co.trofes.ui.CategoryChipsRow
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.getValue
@@ -27,6 +34,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.viewpager2.widget.ViewPager2
+import androidx.lifecycle.Lifecycle
+import pepes.co.trofes.SigninIntentFactory
 
 class HomeActivity : AppCompatActivity() {
 
@@ -48,34 +57,95 @@ class HomeActivity : AppCompatActivity() {
     private val heroHandler = Handler(Looper.getMainLooper())
     private var heroRunnable: Runnable? = null
 
+    private lateinit var homeVm: HomeViewModel
+
+    private lateinit var authSession: AuthSession
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContentView(R.layout.activity_home)
 
+        authSession = AuthSession(this)
+
+        // toggle header login/profile
+        syncHeaderAuthState()
+
+        homeVm = ViewModelProvider(this)[HomeViewModel::class.java]
+
         setupTopActions()
-        setupHeroSlider()
         setupPopularList()
         setupBottomNav()
         setupSearch()
         setupRecommendationCompose()
         setupCategoryChipsCompose()
+
+        observeHomeApi()
+        homeVm.loadHome()
     }
 
-    override fun onStart() {
-        super.onStart()
-        // restart auto-slide ketika balik ke Home
-        heroRunnable?.let { heroHandler.postDelayed(it, 3000) }
+    override fun onResume() {
+        super.onResume()
+        syncHeaderAuthState()
     }
 
-    override fun onStop() {
-        super.onStop()
-        heroRunnable?.let { heroHandler.removeCallbacks(it) }
+    private fun syncHeaderAuthState() {
+        val btnLogin = findViewById<com.google.android.material.button.MaterialButton?>(R.id.btnLogin)
+        val ivProfile = findViewById<ImageView?>(R.id.ivProfile)
+
+        val loggedIn = authSession.isLoggedIn()
+        btnLogin?.visibility = if (loggedIn) View.GONE else View.VISIBLE
+        ivProfile?.visibility = if (loggedIn) View.VISIBLE else View.GONE
+
+        btnLogin?.setOnClickListener {
+            startActivity(SigninIntentFactory.forHome(this))
+        }
+    }
+
+    private fun observeHomeApi() {
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                homeVm.state.collect { st ->
+                    if (st.errorMessage != null) {
+                        Toast.makeText(this@HomeActivity, st.errorMessage, Toast.LENGTH_SHORT).show()
+                    }
+
+                    // Hero dari API
+                    if (st.hero.isNotEmpty()) {
+                        setupHeroSlider(st.hero)
+                    }
+
+                    // Our Recommendation dari API
+                    if (st.recommendations.isNotEmpty()) {
+                        allRecommendations = st.recommendations
+                        // penting: clear dulu agar fallback "Loading..." tidak tersisa
+                        recommendationAdapter.submitList(emptyList())
+                        recommendationAdapter.submitList(allRecommendations)
+                    }
+
+                    // Popular (list bawah) dari API
+                    if (st.popular.isNotEmpty()) {
+                        popularAsRecommendations = st.popular
+                        // penting: clear dulu agar fallback "Loading..." tidak tersisa
+                        popularAdapter.submitList(emptyList())
+                        applyCategoryFilter(selectedCategory)
+                    }
+                }
+            }
+        }
     }
 
     private fun setupTopActions() {
         findViewById<ImageView?>(R.id.ivProfile)?.setOnClickListener {
-            startActivity(Intent(this, SigninActivity::class.java))
+            if (authSession.isLoggedIn()) {
+                startActivity(Intent(this, ProfileActivity::class.java))
+            } else {
+                startActivity(
+                    Intent(this, SigninActivity::class.java).apply {
+                        putExtra(AuthSession.EXTRA_AFTER_LOGIN_TARGET, AuthSession.TARGET_HOME)
+                    }
+                )
+            }
         }
 
         findViewById<ImageButton?>(R.id.btnFilter)?.setOnClickListener {
@@ -102,8 +172,15 @@ class HomeActivity : AppCompatActivity() {
         val rv = findViewById<RecyclerView>(R.id.rvRecipes)
 
         popularAdapter = RecommendationAdapter(
-            onItemClick = { Toast.makeText(this, it.title, Toast.LENGTH_SHORT).show() },
-            // samakan dengan halaman Recipes (grid card)
+            onItemClick = { item ->
+                if (!authSession.isLoggedIn()) {
+                    startActivity(
+                        SigninIntentFactory.forRecipeDetail(this, item)
+                    )
+                    return@RecommendationAdapter
+                }
+                startActivity(RecipeDetailComposeActivity.newIntent(this, item))
+            },
             itemLayoutRes = R.layout.item_recommendation_grid,
         )
 
@@ -116,70 +193,23 @@ class HomeActivity : AppCompatActivity() {
             rv.addItemDecoration(GridSpacingItemDecoration(spanCount = 2, spacingDp = 14, includeEdge = false))
         }
 
-        // pilih kategori ekstra secara acak supaya contoh terasa banyak
-        val extraCategories = listOf(
-            "Halal",
-            "Lactose Intolerance",
-            "Keto / Low Carb",
-            "Weight Loss",
-            "High Protein",
-            "Gluten Free",
-            "Dairy Free",
-            "Spicy",
-            "No Fried Food",
-            "Dairy",
-            "Healty",
-            "Vegan",
-        )
-
-        // Buat data dummy lebih banyak supaya bisa scroll panjang
-        val images = listOf(
-            R.drawable.sample_food_1,
-            R.drawable.sample_food_2,
-            R.drawable.sample_food_hero,
-            R.drawable.berita_1_,
-            R.drawable.banner__1_,
-        )
-
-        // rating demo 1..5 + variasi likes agar sorting Popular masuk akal
-        val ratings = listOf("1.0", "2.0", "2.5", "3.0", "4.0", "5.0")
-
-        allPopularItems = (1..80).map { i ->
-            val rating = ratings.random()
-            val likes = when (rating) {
-                "5.0" -> 2000 + i * 3
-                "4.0" -> 800 + i * 2
-                "3.0" -> 300 + i
-                "2.5" -> 200 + i
-                "2.0" -> 120 + i
-                else -> 40 + i
-            }
-            PopularMenuItem(
-                title = "Popular Menu $i",
-                rating = rating,
-                meta = "${10 + (i % 30)} min · ${180 + (i % 200)} kcal",
-                tag = if (i % 9 == 0) "Halal" else "Demo",
-                category = extraCategories.random(),
-                likesCount = likes,
-                imageRes = images[i % images.size],
+        // fallback hanya untuk state awal sebelum API datang
+        if (popularAsRecommendations.isEmpty()) {
+            popularAsRecommendations = listOf(
+                RecommendationItem(
+                    id = "fallback_popular",
+                    title = "Loading...",
+                    rating = "0.0",
+                    likesCount = 0,
+                    caloriesText = "0",
+                    timeText = "0m",
+                    tagText = "-",
+                    category = "All Menu",
+                    imageRes = R.drawable.berita_1_,
+                    firstDietaryPreference = "-",
+                )
             )
-        }
-
-        // mapping ke model card rekomendasi supaya UI sama persis
-        popularAsRecommendations = allPopularItems.mapIndexed { idx, it ->
-            val (timeText, caloriesText) = parseMetaToTimeCalories(it.meta)
-            RecommendationItem(
-                id = "p$idx",
-                title = it.title,
-                rating = it.rating,
-                likesCount = it.likesCount,
-                caloriesText = caloriesText,
-                timeText = timeText,
-                tagText = it.tag,
-                category = it.category,
-                imageRes = it.imageRes,
-                isLiked = false,
-            )
+            applyCategoryFilter(selectedCategory)
         }
 
         // apply filter awal (default All Menu)
@@ -339,8 +369,15 @@ class HomeActivity : AppCompatActivity() {
         val rv = findViewById<RecyclerView?>(R.id.recommendationCompose) ?: return
 
         recommendationAdapter = RecommendationAdapter(
-            onItemClick = { Toast.makeText(this, it.title, Toast.LENGTH_SHORT).show() },
-            // pakai layout compact (yang sudah ada) untuk strip horizontal
+            onItemClick = { item ->
+                if (!authSession.isLoggedIn()) {
+                    startActivity(
+                        SigninIntentFactory.forRecipeDetail(this, item)
+                    )
+                    return@RecommendationAdapter
+                }
+                startActivity(RecipeDetailComposeActivity.newIntent(this@HomeActivity, item))
+            },
             itemLayoutRes = R.layout.item_recommendation,
         )
 
@@ -355,43 +392,33 @@ class HomeActivity : AppCompatActivity() {
 
         rv.overScrollMode = View.OVER_SCROLL_NEVER
 
-        val extraCategories = listOf(
-            "Halal",
-            "Lactose Intolerance",
-            "Keto / Low Carb",
-            "Weight Loss",
-            "High Protein",
-            "Gluten Free",
-            "Dairy Free",
-            "Spicy",
-            "No Fried Food",
-            "Dairy",
-            "Healty",
-            "Vegan",
-        )
-
-        // Contoh rating 1..5 untuk demo progress bintang pada strip rekomendasi
-        allRecommendations = listOf(
-            RecommendationItem("r1", "Rating 1.0", "1.0", 34, "320", "12m", "Demo", extraCategories.random(), R.drawable.banner__1_),
-            RecommendationItem("r2", "Rating 2.0", "2.0", 56, "340", "14m", "Demo", extraCategories.random(), R.drawable.berita_1_),
-            RecommendationItem("r25", "Rating 2.5", "2.5", 78, "360", "16m", "Demo", extraCategories.random(), R.drawable.banner__1_),
-            RecommendationItem("r3", "Rating 3.0", "3.0", 120, "380", "18m", "Demo", extraCategories.random(), R.drawable.berita_1_),
-            RecommendationItem("r4", "Rating 4.0", "4.0", 500, "500", "36m", "Halal", "Halal", R.drawable.berita_1_),
-            RecommendationItem("r5", "Rating 5.0", "5.0", 999, "520", "22m", "Popular", extraCategories.random(), R.drawable.banner__1_),
-        )
-
-        recommendationAdapter.submitList(allRecommendations)
+        // fallback hanya untuk state awal sebelum API datang
+        if (allRecommendations.isEmpty()) {
+            recommendationAdapter.submitList(
+                listOf(
+                    RecommendationItem(
+                        id = "fallback",
+                        title = "Loading...",
+                        rating = "0.0",
+                        likesCount = 0,
+                        caloriesText = "0",
+                        timeText = "0m",
+                        tagText = "-",
+                        category = "All Menu",
+                        imageRes = R.drawable.banner__1_,
+                        firstDietaryPreference = "-",
+                    )
+                )
+            )
+        }
     }
 
-    private fun setupHeroSlider() {
+    private fun setupHeroSlider(items: List<HeroBannerItem>) {
         val vp = findViewById<ViewPager2?>(R.id.vpHero) ?: return
         val dots = findViewById<android.widget.LinearLayout?>(R.id.heroDots) ?: return
 
-        val items = listOf(
-            HeroBannerItem(R.drawable.banner__1_, "Stay healty"),
-            HeroBannerItem(R.drawable.banner__1_, "Eat smart"),
-            HeroBannerItem(R.drawable.banner__1_, "Find your menu"),
-        )
+        // stop auto slide sebelumnya
+        heroRunnable?.let { heroHandler.removeCallbacks(it) }
 
         vp.adapter = HeroBannerAdapter(items)
         vp.offscreenPageLimit = 1
@@ -400,9 +427,9 @@ class HomeActivity : AppCompatActivity() {
         // cache dots view biar ga recreate object berat terus
         val dotViews = ArrayList<View>(items.size)
 
-        fun buildDotsIfNeeded() {
-            if (dotViews.isNotEmpty()) return
+        fun buildDots() {
             dots.removeAllViews()
+            dotViews.clear()
             repeat(items.size) {
                 val dot = View(this)
                 val lp = android.widget.LinearLayout.LayoutParams(6.dp(), 6.dp())
@@ -420,7 +447,7 @@ class HomeActivity : AppCompatActivity() {
         }
 
         fun selectDot(index: Int) {
-            buildDotsIfNeeded()
+            if (dotViews.isEmpty()) return
             dotViews.forEachIndexed { i, v ->
                 val w = if (i == index) 14.dp() else 6.dp()
                 val params = v.layoutParams as android.widget.LinearLayout.LayoutParams
@@ -433,6 +460,7 @@ class HomeActivity : AppCompatActivity() {
             }
         }
 
+        buildDots()
         selectDot(0)
 
         vp.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
@@ -441,18 +469,29 @@ class HomeActivity : AppCompatActivity() {
             }
         })
 
-        // auto slide tiap 3 detik
-        heroRunnable = object : Runnable {
-            override fun run() {
-                val next = (vp.currentItem + 1) % items.size
-                vp.setCurrentItem(next, true)
-                heroHandler.postDelayed(this, 3000)
+        // auto slide tiap 3 detik (kalau item > 1)
+        heroRunnable = if (items.size > 1) {
+            object : Runnable {
+                override fun run() {
+                    val next = (vp.currentItem + 1) % items.size
+                    vp.setCurrentItem(next, true)
+                    heroHandler.postDelayed(this, 3000)
+                }
             }
-        }
+        } else null
 
-        // start
-        heroHandler.removeCallbacksAndMessages(null)
-        heroHandler.postDelayed(heroRunnable!!, 3000)
+        heroRunnable?.let { heroHandler.postDelayed(it, 3000) }
+    }
+
+    private fun setupHeroSlider() {
+        // fallback dummy jika API belum kebaca
+        setupHeroSlider(
+            listOf(
+                HeroBannerItem(imageRes = R.drawable.banner__1_, title = "Stay healty"),
+                HeroBannerItem(imageRes = R.drawable.banner__1_, title = "Eat smart"),
+                HeroBannerItem(imageRes = R.drawable.banner__1_, title = "Find your menu"),
+            )
+        )
     }
 
     private fun Int.dp(): Int = (this * resources.displayMetrics.density).toInt()

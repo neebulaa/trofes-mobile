@@ -5,6 +5,7 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import coil.load
 
 class HeroBannerAdapter(
     private val items: List<HeroBannerItem>,
@@ -27,7 +28,12 @@ class HeroBannerAdapter(
         private val tv: TextView = itemView.findViewById(R.id.tvBannerTitle)
 
         fun bind(item: HeroBannerItem) {
-            iv.setImageResource(item.imageRes)
+            val placeholderRes = item.imageRes ?: R.drawable.banner__1_
+            iv.load(item.imageUrl) {
+                placeholder(placeholderRes)
+                error(placeholderRes)
+                crossfade(true)
+            }
             tv.text = item.title
         }
     }

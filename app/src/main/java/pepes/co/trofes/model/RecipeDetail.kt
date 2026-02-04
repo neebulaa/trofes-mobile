@@ -1,5 +1,6 @@
 package pepes.co.trofes.model
 
+import pepes.co.trofes.R
 import pepes.co.trofes.RecommendationItem
 
 /**
@@ -35,7 +36,7 @@ data class RecipeDetail(
                 subtitle = "Halal, Lactose Free, Low Carb, Weight Loss",
                 rating = rating,
                 ratingCount = ratingCount,
-                imageRes = item.imageRes,
+                imageRes = item.imageRes ?: R.drawable.ic_person_outline,
                 chips = listOf(
                     InfoChip(label = "Calories", value = "500kcal"),
                     InfoChip(label = "Calories", value = "500kcal"),

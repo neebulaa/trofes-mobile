@@ -2,22 +2,77 @@ package pepes.co.trofes
 
 import android.content.Intent
 import android.os.Bundle
+import android.view.View
+import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.google.android.material.button.MaterialButton
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import pepes.co.trofes.auth.AuthSession
 
 class GuideActivity : AppCompatActivity() {
+
+    private lateinit var authSession: AuthSession
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_guide)
 
+        authSession = AuthSession(this)
+
+        setupTopActions()
         setupBottomNav()
 
         val rv = findViewById<RecyclerView>(R.id.rvGuides)
         rv.layoutManager = LinearLayoutManager(this)
-        rv.adapter = GuideAdapter(dummyGuides())
+        rv.adapter = GuideAdapter(dummyGuides()) { guide ->
+            if (!authSession.isLoggedIn()) {
+                startActivity(
+                    Intent(this, SigninActivity::class.java).apply {
+                        putExtra(AuthSession.EXTRA_AFTER_LOGIN_TARGET, AuthSession.TARGET_GUIDE_DETAIL)
+                        putExtras(GuideDetailActivity.newBundle(guide))
+                    }
+                )
+                return@GuideAdapter
+            }
+
+            startActivity(Intent(this, GuideDetailActivity::class.java).apply {
+                putExtras(GuideDetailActivity.newBundle(guide))
+            })
+        }
+
+        syncHeaderAuthState()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        // Kalau habis login / logout, header harus update
+        syncHeaderAuthState()
+    }
+
+    private fun setupTopActions() {
+        findViewById<MaterialButton?>(R.id.btnLogin)?.setOnClickListener {
+            startActivity(SigninIntentFactory.forHome(this))
+        }
+
+        findViewById<ImageView?>(R.id.ivProfile)?.setOnClickListener {
+            if (authSession.isLoggedIn()) {
+                startActivity(Intent(this, ProfileActivity::class.java))
+            } else {
+                startActivity(SigninIntentFactory.forHome(this))
+            }
+        }
+    }
+
+    private fun syncHeaderAuthState() {
+        val btnLogin = findViewById<MaterialButton?>(R.id.btnLogin)
+        val ivProfile = findViewById<ImageView?>(R.id.ivProfile)
+
+        val loggedIn = authSession.isLoggedIn()
+        btnLogin?.visibility = if (loggedIn) View.GONE else View.VISIBLE
+        ivProfile?.visibility = if (loggedIn) View.VISIBLE else View.GONE
     }
 
     private fun setupBottomNav() {

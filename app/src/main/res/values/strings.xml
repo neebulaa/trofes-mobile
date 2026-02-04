@@ -75,7 +75,7 @@
     <string name="unit_gr">gr</string>
     <string name="unit_mg">mg</string>
 
-    <!-- ...existing code... -->
+    <!-- Guide page strings -->
     <string name="guide_title">Ayo <b><font color='#22B14C'>Belajar</font></b> Bersama</string>
     <string name="guide_subtitle">Temukan berbagai tutorial yang telah kami siapkan untuk membantu Anda memahami setiap langkah dengan lebih mudah.</string>
     <string name="search_hint">Search...</string>
@@ -84,6 +84,11 @@
     <string name="guide_article_title">Tentang Vitamin</string>
     <string name="guide_article_desc">Vitamin adalah senyawa penting yang dibutuhkan tubuh dalam jumlah kecil ...</string>
     <string name="guide_article_date">18/10/25</string>
+
+    <!-- Guide header title parts (avoid hardcoded strings in XML) -->
+    <string name="guide_title_left">Ayo</string>
+    <string name="guide_title_center">Belajar</string>
+    <string name="guide_title_right">Bersama</string>
 
     <!-- Strings for Camera page -->
     <string name="upload">Upload</string>
@@ -106,4 +111,15 @@
     <string name="placeholder_36m">36m</string>
     <string name="placeholder_halal">Halal</string>
     <string name="placeholder_2">2</string>
+
+    <!-- Home page strings -->
+    <string name="home_greeting">Hi User</string>
+    <string name="home_subtitle">Let\'s eat</string>
+    <string name="home_recommendation">Our Recommendation</string>
+    <string name="home_popular_menus">Popular menus</string>
+    <string name="view_all">View all</string>
+    <string name="login">Login</string>
+
+    <!-- Google Sign-In: ganti value ini dengan WEB_CLIENT_ID dari Firebase/Google Cloud -->
+    <string name="default_web_client_id">REPLACE_WITH_WEB_CLIENT_ID</string>
 </resources>
