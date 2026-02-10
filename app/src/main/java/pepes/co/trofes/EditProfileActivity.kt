@@ -7,13 +7,13 @@ import android.widget.EditText
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
-import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.button.MaterialButton
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
+import pepes.co.trofes.auth.BaseAuthActivity
 
-class EditProfileActivity : AppCompatActivity() {
+class EditProfileActivity : BaseAuthActivity() {
 
     private lateinit var prefs: ProfilePrefs
 
@@ -28,6 +28,8 @@ class EditProfileActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        if (isAuthRedirected) return
+
         enableEdgeToEdge()
         setContentView(R.layout.activity_edit_profile)
 
@@ -94,4 +96,6 @@ class EditProfileActivity : AppCompatActivity() {
             cal.get(Calendar.DAY_OF_MONTH)
         ).show()
     }
+
+    override fun requiredLoginIntent(): android.content.Intent = SigninIntentFactory.forEditProfile(this)
 }

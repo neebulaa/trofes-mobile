@@ -11,8 +11,9 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import pepes.co.trofes.auth.BaseAuthActivity
 
-class ChatActivity : AppCompatActivity() {
+class ChatActivity : BaseAuthActivity() {
 
     private lateinit var adapter: ChatMessageAdapter
     private lateinit var lm: LinearLayoutManager
@@ -20,6 +21,8 @@ class ChatActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        if (isAuthRedirected) return
+
         enableEdgeToEdge()
         setContentView(R.layout.activity_chat)
 
@@ -120,6 +123,11 @@ class ChatActivity : AppCompatActivity() {
     private fun nowTime(): String {
         return DateFormat.format("h:mm a", System.currentTimeMillis()).toString().lowercase()
     }
+
+    override fun requiredLoginIntent(): android.content.Intent =
+        SigninIntentFactory.forChat(this).apply {
+            putExtras(intent.extras ?: Bundle())
+        }
 
     companion object {
         const val EXTRA_THREAD_NAME = "extra_thread_name"

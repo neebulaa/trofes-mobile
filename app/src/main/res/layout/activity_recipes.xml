@@ -7,272 +7,301 @@
     android:background="@android:color/white"
     tools:context=".RecipesActivity">
 
-    <androidx.core.widget.NestedScrollView
-        android:id="@+id/recipesScroll"
+    <!-- CONTENT (tanpa NestedScrollView) -->
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/recipesContent"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:fillViewport="true">
+        android:layout_height="match_parent">
 
+        <!-- Green curved header background -->
+        <View
+            android:id="@+id/headerBackground"
+            android:layout_width="0dp"
+            android:layout_height="260dp"
+            android:background="@drawable/bg_header_curved"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <!-- Greeting -->
+        <TextView
+            android:id="@+id/tvGreeting"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="24dp"
+            android:layout_marginTop="64dp"
+            android:text="@string/recipes_greeting"
+            android:textColor="@android:color/white"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toStartOf="@id/headerRightBarrier"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/tvSubtitle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:text="@string/recipes_subtitle"
+            android:textColor="@android:color/white"
+            android:textSize="16sp"
+            app:layout_constraintEnd_toEndOf="@id/tvGreeting"
+            app:layout_constraintStart_toStartOf="@id/tvGreeting"
+            app:layout_constraintTop_toBottomOf="@id/tvGreeting" />
+
+        <!-- Profile button -->
+        <ImageView
+            android:id="@+id/ivProfile"
+            android:layout_width="52dp"
+            android:layout_height="52dp"
+            android:layout_marginTop="66dp"
+            android:layout_marginEnd="24dp"
+            android:background="@drawable/bg_search_field"
+            android:clickable="true"
+            android:contentDescription="@string/profile"
+            android:focusable="true"
+            android:padding="12dp"
+            android:src="@drawable/ic_person_outline"
+            android:visibility="gone"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <!-- Login button (muncul kalau belum login) -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnLogin"
+            android:layout_width="wrap_content"
+            android:layout_height="44dp"
+            android:layout_marginTop="66dp"
+            android:layout_marginEnd="24dp"
+            android:minHeight="44dp"
+            android:minWidth="72dp"
+            android:text="@string/login"
+            android:textAllCaps="false"
+            android:textColor="@android:color/white"
+            android:textStyle="bold"
+            android:visibility="gone"
+            app:backgroundTint="@color/trofes_green"
+            app:cornerRadius="22dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <!-- Barrier: sisi kiri dari view kanan (Login/Profile) yang sedang tampil -->
+        <androidx.constraintlayout.widget.Barrier
+            android:id="@+id/headerRightBarrier"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:barrierDirection="start"
+            app:constraint_referenced_ids="ivProfile,btnLogin" />
+
+        <!-- Search + Filter row -->
         <androidx.constraintlayout.widget.ConstraintLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:id="@+id/searchRow"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="24dp"
+            android:layout_marginTop="20dp"
+            android:layout_marginEnd="24dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tvSubtitle">
 
-            <!-- Green curved header background -->
-            <View
-                android:id="@+id/headerBackground"
-                android:layout_width="0dp"
-                android:layout_height="260dp"
-                android:background="@drawable/bg_header_curved"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
-
-            <!-- Greeting -->
-            <TextView
-                android:id="@+id/tvGreeting"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="24dp"
-                android:layout_marginTop="64dp"
-                android:text="@string/recipes_greeting"
-                android:textColor="@android:color/white"
-                android:textSize="24sp"
-                android:textStyle="bold"
-                app:layout_constraintEnd_toStartOf="@id/headerRightBarrier"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
-
-            <TextView
-                android:id="@+id/tvSubtitle"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="2dp"
-                android:text="@string/recipes_subtitle"
-                android:textColor="@android:color/white"
-                android:textSize="16sp"
-                app:layout_constraintEnd_toEndOf="@id/tvGreeting"
-                app:layout_constraintStart_toStartOf="@id/tvGreeting"
-                app:layout_constraintTop_toBottomOf="@id/tvGreeting" />
-
-            <!-- Profile button -->
-            <ImageView
-                android:id="@+id/ivProfile"
-                android:layout_width="52dp"
-                android:layout_height="52dp"
-                android:layout_marginTop="66dp"
-                android:layout_marginEnd="24dp"
-                android:background="@drawable/bg_search_field"
-                android:clickable="true"
-                android:focusable="true"
-                android:padding="12dp"
-                android:src="@drawable/ic_person_outline"
-                android:contentDescription="@string/profile"
-                android:visibility="gone"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
-
-            <!-- Login button (muncul kalau belum login) -->
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnLogin"
-                android:layout_width="wrap_content"
-                android:layout_height="44dp"
-                android:layout_marginTop="66dp"
-                android:layout_marginEnd="24dp"
-                android:minHeight="44dp"
-                android:minWidth="72dp"
-                android:text="@string/login"
-                android:textAllCaps="false"
-                android:textStyle="bold"
-                android:textColor="@android:color/white"
-                android:visibility="gone"
-                app:backgroundTint="@color/trofes_green"
-                app:cornerRadius="22dp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
-
-            <!-- Barrier: sisi kiri dari view kanan (Login/Profile) yang sedang tampil -->
-            <androidx.constraintlayout.widget.Barrier
-                android:id="@+id/headerRightBarrier"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                app:barrierDirection="start"
-                app:constraint_referenced_ids="ivProfile,btnLogin" />
-
-            <!-- Search + Filter row -->
-            <androidx.constraintlayout.widget.ConstraintLayout
-                android:id="@+id/searchRow"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="24dp"
-                android:layout_marginTop="20dp"
-                android:layout_marginEnd="24dp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/tvSubtitle">
-
-                <LinearLayout
-                    android:id="@+id/searchContainer"
-                    android:layout_width="0dp"
-                    android:layout_height="56dp"
-                    android:background="@drawable/bg_search_field"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal"
-                    android:paddingStart="16dp"
-                    android:paddingEnd="16dp"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toStartOf="@id/btnFilter"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent">
-
-                    <ImageView
-                        android:layout_width="24dp"
-                        android:layout_height="24dp"
-                        android:contentDescription="@null"
-                        android:src="@drawable/ic_search"
-                        app:tint="#424242" />
-
-                    <EditText
-                        android:id="@+id/etSearch"
-                        android:layout_width="0dp"
-                        android:layout_height="match_parent"
-                        android:layout_marginStart="12dp"
-                        android:layout_weight="1"
-                        android:autofillHints=""
-                        android:background="@null"
-                        android:hint="@string/search"
-                        android:imeOptions="actionSearch"
-                        android:inputType="text"
-                        android:textColor="#333333"
-                        android:textColorHint="#9E9E9E" />
-                </LinearLayout>
-
-                <ImageButton
-                    android:id="@+id/btnFilter"
-                    android:layout_width="56dp"
-                    android:layout_height="56dp"
-                    android:layout_marginStart="14dp"
-                    android:background="@drawable/bg_filter_button"
-                    android:contentDescription="@null"
-                    android:scaleType="center"
-                    android:src="@drawable/ic_tune"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:tint="@android:color/white" />
-
-            </androidx.constraintlayout.widget.ConstraintLayout>
-
-            <!-- Chips kategori (Compose) -->
-            <androidx.compose.ui.platform.ComposeView
-                android:id="@+id/categoryChipsCompose"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="18dp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/searchRow" />
-
-            <!-- Grid recipes (2 columns) -->
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/rvRecipes"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="18dp"
-                android:nestedScrollingEnabled="false"
-                android:paddingStart="24dp"
-                android:paddingEnd="24dp"
-                android:clipToPadding="false"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/categoryChipsCompose"
-                tools:listitem="@layout/item_recommendation" />
-
-            <!-- Empty state (tinggi konsisten) -->
             <LinearLayout
-                android:id="@+id/emptyRecipesState"
+                android:id="@+id/searchContainer"
                 android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:minHeight="420dp"
-                android:layout_marginTop="18dp"
-                android:layout_marginStart="24dp"
-                android:layout_marginEnd="24dp"
-                android:gravity="center"
-                android:orientation="vertical"
-                android:visibility="gone"
-                app:layout_constraintEnd_toEndOf="parent"
+                android:layout_height="56dp"
+                android:background="@drawable/bg_search_field"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/btnFilter"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/categoryChipsCompose">
+                app:layout_constraintTop_toTopOf="parent">
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/recipe_not_found"
-                    android:textColor="@color/trofes_text"
-                    android:textSize="16sp"
-                    android:textStyle="bold" />
+                <ImageView
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:contentDescription="@null"
+                    android:src="@drawable/ic_search"
+                    app:tint="#424242" />
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="6dp"
-                    android:text="@string/try_another_keyword"
-                    android:textColor="@color/trofes_muted"
-                    android:textSize="13sp" />
-
+                <EditText
+                    android:id="@+id/etSearch"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginStart="12dp"
+                    android:layout_weight="1"
+                    android:autofillHints=""
+                    android:background="@null"
+                    android:hint="@string/search"
+                    android:imeOptions="actionSearch"
+                    android:inputType="text"
+                    android:textColor="#333333"
+                    android:textColorHint="#9E9E9E" />
             </LinearLayout>
 
-            <!-- Spacer so last items don't collide with BottomAppBar/FAB -->
-            <View
-                android:id="@+id/bottomSpacer"
-                android:layout_width="0dp"
-                android:layout_height="110dp"
-                app:layout_constraintStart_toStartOf="parent"
+            <ImageButton
+                android:id="@+id/btnFilter"
+                android:layout_width="56dp"
+                android:layout_height="56dp"
+                android:layout_marginStart="14dp"
+                android:background="@drawable/bg_filter_button"
+                android:contentDescription="@null"
+                android:scaleType="center"
+                android:src="@drawable/ic_tune"
+                app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/rvRecipes" />
+                app:layout_constraintTop_toTopOf="parent"
+                app:tint="@android:color/white" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
-    </androidx.core.widget.NestedScrollView>
 
-    <!-- Bottom navigation: FULL WIDTH -->
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/bottomNavContainer"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom"
-        android:clipChildren="false"
-        android:clipToPadding="false">
-
-        <ImageView
-            android:id="@+id/ivCurvedBackground"
+        <!-- Chips kategori (Compose) -->
+        <androidx.compose.ui.platform.ComposeView
+            android:id="@+id/categoryChipsCompose"
             android:layout_width="0dp"
-            android:layout_height="70dp"
-            android:src="@drawable/bg_curved_nav"
-            android:scaleType="fitXY"
-            android:elevation="0dp"
-            android:translationZ="0dp"
-            android:contentDescription="@null"
-            app:layout_constraintBottom_toBottomOf="parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="18dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/searchRow" />
+
+        <!-- Empty state (overlay area scroll list) -->
+        <LinearLayout
+            android:id="@+id/emptyRecipesState"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginTop="18dp"
+            android:layout_marginStart="24dp"
+            android:layout_marginEnd="24dp"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:visibility="gone"
+            app:layout_constraintTop_toBottomOf="@id/categoryChipsCompose"
+            app:layout_constraintBottom_toTopOf="@id/bottomNavContainer"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/recipe_not_found"
+                android:textColor="@color/trofes_text"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:text="@string/try_another_keyword"
+                android:textColor="@color/trofes_muted"
+                android:textSize="13sp" />
+
+        </LinearLayout>
+
+        <!-- Grid recipes (2 columns) - SCROLLER UTAMA -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rvRecipes"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginTop="18dp"
+            android:clipToPadding="false"
+            android:paddingStart="24dp"
+            android:paddingEnd="24dp"
+            android:paddingBottom="170dp"
+            android:overScrollMode="never"
+            app:layout_constraintTop_toBottomOf="@id/categoryChipsCompose"
+            app:layout_constraintBottom_toTopOf="@id/bottomNavContainer"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            tools:listitem="@layout/item_recommendation" />
+
+        <!-- Loading more (infinite scroll) : overlay di bawah list -->
+        <ProgressBar
+            android:id="@+id/pbLoadMore"
+            style="?android:attr/progressBarStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="86dp"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="@id/rvRecipes"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent" />
 
-        <com.google.android.material.bottomnavigation.BottomNavigationView
-            android:id="@+id/bottomNavigation"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:clipToPadding="false"
-            android:paddingTop="0dp"
-            android:elevation="0dp"
-            android:translationZ="0dp"
-            app:itemIconTint="@color/bottom_nav_item_tint"
-            app:itemTextColor="@color/bottom_nav_item_color"
-            app:itemIconSize="24dp"
-            app:labelVisibilityMode="labeled"
-            app:menu="@menu/bottom_nav_menu"
-            app:itemHorizontalTranslationEnabled="false"
-            app:layout_constraintBottom_toBottomOf="@+id/ivCurvedBackground"
-            app:layout_constraintEnd_toEndOf="parent"
+        <TextView
+            android:id="@+id/tvLoadMore"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="64dp"
+            android:text="@string/loading"
+            android:textColor="@color/trofes_muted"
+            android:textSize="12sp"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="@id/rvRecipes"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/ivCurvedBackground" />
+            app:layout_constraintEnd_toEndOf="parent" />
+
+        <TextView
+            android:id="@+id/tvNoMoreRecipes"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="64dp"
+            android:text="@string/no_more_recipes"
+            android:textColor="@color/trofes_muted"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="@id/rvRecipes"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+        <!-- Bottom navigation container (anchor) -->
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/bottomNavContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:clipChildren="false"
+            android:clipToPadding="false"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent">
+
+            <ImageView
+                android:id="@+id/ivCurvedBackground"
+                android:layout_width="0dp"
+                android:layout_height="70dp"
+                android:contentDescription="@null"
+                android:elevation="0dp"
+                android:scaleType="fitXY"
+                android:src="@drawable/bg_curved_nav"
+                android:translationZ="0dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent" />
+
+            <com.google.android.material.bottomnavigation.BottomNavigationView
+                android:id="@+id/bottomNavigation"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:clipToPadding="false"
+                android:elevation="0dp"
+                android:paddingTop="0dp"
+                android:translationZ="0dp"
+                app:itemHorizontalTranslationEnabled="false"
+                app:itemIconSize="24dp"
+                app:itemIconTint="@color/bottom_nav_item_tint"
+                app:itemTextColor="@color/bottom_nav_item_color"
+                app:labelVisibilityMode="labeled"
+                app:layout_constraintBottom_toBottomOf="@+id/ivCurvedBackground"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/ivCurvedBackground"
+                app:menu="@menu/bottom_nav_menu" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -283,11 +312,11 @@
         android:layout_height="58dp"
         android:layout_gravity="bottom|center_horizontal"
         android:layout_marginBottom="24dp"
+        android:contentDescription="@string/logo_desc"
+        android:elevation="20dp"
         android:padding="0dp"
         android:scaleType="centerInside"
         android:src="@mipmap/ic_main_foreground"
-        android:contentDescription="@string/logo_desc"
-        android:elevation="20dp"
         android:translationZ="20dp"
         app:backgroundTint="@color/trofes_green"
         app:borderWidth="0dp"

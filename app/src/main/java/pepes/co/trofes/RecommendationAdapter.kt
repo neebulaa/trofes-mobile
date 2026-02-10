@@ -46,6 +46,7 @@ class RecommendationAdapter(
         private val tvCalories: TextView = itemView.findViewById(R.id.tvRecCalories)
         private val tvTime: TextView = itemView.findViewById(R.id.tvRecTime)
         private val tvTag: TextView = itemView.findViewById(R.id.tvRecTag)
+        private val tagContainer: android.view.View? = runCatching { itemView.findViewById<android.view.View>(R.id.tagContainer) }.getOrNull()
         private val badgePopular: android.view.View = itemView.findViewById(R.id.badgePopular)
         private val btnLike: ImageButton = itemView.findViewById(R.id.btnRecLike)
 
@@ -70,7 +71,13 @@ class RecommendationAdapter(
             // ikon daun = total bahan (total_ingredient)
             tvCalories.text = item.ingredientsCount.toString()
             tvTime.text = item.timeText
-            tvTag.text = item.tagText
+
+            // Chip hijau: pakai dietary preference pertama (tagText). Kalau kosong -> hide.
+            val tag = item.tagText.trim()
+            tvTag.text = tag
+            val showTag = tag.isNotBlank()
+            tvTag.visibility = if (showTag) android.view.View.VISIBLE else android.view.View.GONE
+            tagContainer?.visibility = if (showTag) android.view.View.VISIBLE else android.view.View.GONE
 
             // Rating: 1 star yang terisi sesuai rating/5 + angka
             val ratingValue = item.rating.toFloatOrNull()?.coerceIn(0f, 5f) ?: 0f

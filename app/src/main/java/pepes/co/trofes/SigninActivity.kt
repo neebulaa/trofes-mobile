@@ -51,10 +51,10 @@ class SigninActivity : AppCompatActivity() {
             passwordVisible = !passwordVisible
             if (passwordVisible) {
                 etPassword.inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD
-                ivTogglePassword.setImageResource(R.drawable.ic_eye_on)
+                ivTogglePassword.setImageResource(R.mipmap.ic_eyeon_foreground)
             } else {
                 etPassword.inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD
-                ivTogglePassword.setImageResource(R.drawable.ic_eye_off)
+                ivTogglePassword.setImageResource(R.mipmap.ic_eyeoff_foreground)
             }
             etPassword.setSelection(etPassword.text?.length ?: 0)
         }
@@ -193,8 +193,61 @@ class SigninActivity : AppCompatActivity() {
                 finishAffinity()
                 return
             }
+
+            AuthSession.TARGET_RECIPES -> {
+                startActivity(Intent(this, RecipesActivity::class.java))
+                finishAffinity()
+                return
+            }
+
+            AuthSession.TARGET_GUIDES -> {
+                startActivity(Intent(this, GuideActivity::class.java))
+                finishAffinity()
+                return
+            }
+
+            AuthSession.TARGET_CUSTOMIZE -> {
+                startActivity(Intent(this, CustomizeActivity::class.java))
+                finishAffinity()
+                return
+            }
+
+            AuthSession.TARGET_CALCULATOR -> {
+                startActivity(Intent(this, CalculatorActivity::class.java))
+                finishAffinity()
+                return
+            }
+
+            AuthSession.TARGET_EDIT_PROFILE -> {
+                startActivity(Intent(this, EditProfileActivity::class.java).apply {
+                    putExtras(intent.extras ?: Bundle())
+                })
+                finishAffinity()
+                return
+            }
+
+            AuthSession.TARGET_CONTACT_US -> {
+                startActivity(Intent(this, ContactUsActivity::class.java))
+                finishAffinity()
+                return
+            }
+
+            AuthSession.TARGET_CHAT -> {
+                startActivity(Intent(this, ChatActivity::class.java).apply {
+                    putExtras(intent.extras ?: Bundle())
+                })
+                finishAffinity()
+                return
+            }
+
+            AuthSession.TARGET_HOME -> {
+                startActivity(Intent(this, HomeActivity::class.java))
+                finishAffinity()
+                return
+            }
         }
 
+        // fallback: kalau tidak ada target, jangan memaksa Home. Pakai Home sebagai default aman.
         startActivity(Intent(this, HomeActivity::class.java))
         finishAffinity()
     }

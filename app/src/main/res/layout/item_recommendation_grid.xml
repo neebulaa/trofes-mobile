@@ -178,6 +178,7 @@
             android:orientation="horizontal">
 
             <com.google.android.material.card.MaterialCardView
+                android:id="@+id/tagContainer"
                 android:layout_width="wrap_content"
                 android:layout_height="20dp"
                 app:cardCornerRadius="10dp"

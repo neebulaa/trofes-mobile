@@ -122,4 +122,7 @@
 
     <!-- Google Sign-In: ganti value ini dengan WEB_CLIENT_ID dari Firebase/Google Cloud -->
     <string name="default_web_client_id">REPLACE_WITH_WEB_CLIENT_ID</string>
+
+    <string name="loading">Loading…</string>
+    <string name="no_more_recipes">No more recipes</string>
 </resources>

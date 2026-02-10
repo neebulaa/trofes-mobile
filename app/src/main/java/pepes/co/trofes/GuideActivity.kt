@@ -2,32 +2,100 @@ package pepes.co.trofes
 
 import android.content.Intent
 import android.os.Bundle
-import android.view.View
-import android.widget.ImageView
+import android.util.Log
+import android.view.KeyEvent
+import android.view.inputmethod.EditorInfo
+import android.widget.EditText
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomnavigation.BottomNavigationView
-import com.google.android.material.button.MaterialButton
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import kotlinx.coroutines.launch
 import pepes.co.trofes.auth.AuthSession
+import pepes.co.trofes.auth.BaseAuthActivity
+import pepes.co.trofes.data.remote.RetrofitClient
+import pepes.co.trofes.data.remote.extractGuides
+import pepes.co.trofes.data.remote.lastPage
+import pepes.co.trofes.data.remote.nextPageUrl
 
-class GuideActivity : AppCompatActivity() {
+class GuideActivity : BaseAuthActivity() {
 
-    private lateinit var authSession: AuthSession
+    override fun requiredLoginIntent(): android.content.Intent = SigninIntentFactory.forGuides(this)
+
+    private lateinit var adapter: GuideAdapter
+    private lateinit var layoutManager: LinearLayoutManager
+
+    private val loadedItems = mutableListOf<GuideArticle>()
+
+    private var isLoading = false
+    private var currentPage = 1
+    private var canLoadMore = true
+    private val perPage = 10
+    private var currentQuery: String = ""
+
+    private val logTag = "GuidesPaging"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        if (isAuthRedirected) return
+
         setContentView(R.layout.activity_guide)
 
-        authSession = AuthSession(this)
-
         setupTopActions()
-        setupBottomNav()
+        syncHeaderAuthState()
 
+        setupBottomNav()
+        setupList()
+        setupSearch()
+
+        resetAndLoadFirstPage()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        syncHeaderAuthState()
+    }
+
+    private fun setupTopActions() {
+        findViewById<com.google.android.material.button.MaterialButton?>(R.id.btnLogin)?.setOnClickListener {
+            startActivity(SigninIntentFactory.forGuides(this))
+        }
+
+        findViewById<android.widget.ImageView?>(R.id.ivProfile)?.setOnClickListener {
+            if (authSession.isLoggedIn()) {
+                startActivity(Intent(this, ProfileActivity::class.java))
+            } else {
+                startActivity(SigninIntentFactory.forGuides(this))
+            }
+        }
+    }
+
+    private fun syncHeaderAuthState() {
+        val btnLogin = findViewById<com.google.android.material.button.MaterialButton?>(R.id.btnLogin)
+        val ivProfile = findViewById<android.widget.ImageView?>(R.id.ivProfile)
+        val tvGreeting = findViewById<android.widget.TextView?>(R.id.tvGreeting)
+
+        val loggedIn = authSession.isLoggedIn()
+        btnLogin?.visibility = if (loggedIn) android.view.View.GONE else android.view.View.VISIBLE
+        ivProfile?.visibility = if (loggedIn) android.view.View.VISIBLE else android.view.View.GONE
+
+        if (loggedIn) {
+            val username = authSession.getUser()?.username?.ifBlank { "" }.orEmpty()
+            tvGreeting?.text = if (username.isNotBlank()) "Hi $username" else "Hi"
+        } else {
+            tvGreeting?.text = "Hi"
+        }
+    }
+
+    private fun setupList() {
         val rv = findViewById<RecyclerView>(R.id.rvGuides)
-        rv.layoutManager = LinearLayoutManager(this)
-        rv.adapter = GuideAdapter(dummyGuides()) { guide ->
+        layoutManager = LinearLayoutManager(this)
+        rv.layoutManager = layoutManager
+
+        adapter = GuideAdapter { guide ->
             if (!authSession.isLoggedIn()) {
                 startActivity(
                     Intent(this, SigninActivity::class.java).apply {
@@ -42,37 +110,119 @@ class GuideActivity : AppCompatActivity() {
                 putExtras(GuideDetailActivity.newBundle(guide))
             })
         }
+        rv.adapter = adapter
 
-        syncHeaderAuthState()
+        rv.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                super.onScrolled(recyclerView, dx, dy)
+                if (dy <= 0) return
+
+                val total = layoutManager.itemCount
+                val lastVisible = layoutManager.findLastVisibleItemPosition()
+
+                Log.d(logTag, "onScrolled dy=$dy lastVisible=$lastVisible total=$total isLoading=$isLoading canLoadMore=$canLoadMore")
+
+                if (!isLoading && canLoadMore && lastVisible >= total - 4) {
+                    loadNextPageIfNeeded()
+                }
+            }
+        })
     }
 
-    override fun onResume() {
-        super.onResume()
-        // Kalau habis login / logout, header harus update
-        syncHeaderAuthState()
-    }
+    private fun setupSearch() {
+        val etSearch = findViewById<EditText?>(R.id.etSearch) ?: return
 
-    private fun setupTopActions() {
-        findViewById<MaterialButton?>(R.id.btnLogin)?.setOnClickListener {
-            startActivity(SigninIntentFactory.forHome(this))
-        }
+        etSearch.setOnEditorActionListener { v, actionId, event ->
+            val isSearchAction = actionId == EditorInfo.IME_ACTION_SEARCH
+            val isEnter = event?.keyCode == KeyEvent.KEYCODE_ENTER && event.action == KeyEvent.ACTION_DOWN
 
-        findViewById<ImageView?>(R.id.ivProfile)?.setOnClickListener {
-            if (authSession.isLoggedIn()) {
-                startActivity(Intent(this, ProfileActivity::class.java))
+            if (isSearchAction || isEnter) {
+                currentQuery = v.text?.toString().orEmpty()
+                resetAndLoadFirstPage()
+                true
             } else {
-                startActivity(SigninIntentFactory.forHome(this))
+                false
             }
         }
     }
 
-    private fun syncHeaderAuthState() {
-        val btnLogin = findViewById<MaterialButton?>(R.id.btnLogin)
-        val ivProfile = findViewById<ImageView?>(R.id.ivProfile)
+    private fun resetAndLoadFirstPage() {
+        loadedItems.clear()
+        adapter.submitList(emptyList())
 
-        val loggedIn = authSession.isLoggedIn()
-        btnLogin?.visibility = if (loggedIn) View.GONE else View.VISIBLE
-        ivProfile?.visibility = if (loggedIn) View.VISIBLE else View.GONE
+        currentPage = 1
+        canLoadMore = true
+
+        fetchGuidesPage(page = currentPage, query = currentQuery)
+    }
+
+    private fun loadNextPageIfNeeded() {
+        if (isLoading || !canLoadMore) return
+        fetchGuidesPage(page = currentPage + 1, query = currentQuery)
+    }
+
+    private fun fetchGuidesPage(page: Int, query: String) {
+        if (isLoading) return
+        if (!canLoadMore) return
+
+        isLoading = true
+
+        Log.d(logTag, "fetchGuidesPage(page=$page perPage=$perPage query='${query}')")
+
+        lifecycleScope.launch {
+            try {
+                val resp = RetrofitClient.apiService.getGuides(
+                    page = page,
+                    perPage = perPage,
+                    search = query.takeIf { it.isNotBlank() },
+                )
+
+                val guides = resp.extractGuides()
+                Log.d(logTag, "resp guides.size=${guides.size} nextPageUrl=${resp.nextPageUrl()} lastPage=${resp.lastPage()}")
+
+                val last = resp.lastPage()
+                canLoadMore = when {
+                    !resp.nextPageUrl().isNullOrBlank() -> true
+                    last != null -> page < last
+                    else -> guides.isNotEmpty()
+                }
+
+                val mapped = guides.map { g ->
+                    val id = (g.guideId ?: g.id ?: 0L).toString()
+                    val title = g.title.orEmpty()
+                    val desc = g.excerpt ?: g.content ?: ""
+                    val date = g.publishedAt ?: ""
+                    val imageUrl = g.publicImage ?: g.image
+
+                    GuideArticle(
+                        id = id,
+                        title = title,
+                        desc = desc,
+                        date = date,
+                        imageUrl = imageUrl,
+                        content = g.content,
+                        slug = g.slug,
+                        publishedAt = g.publishedAt,
+                    )
+                }
+
+                if (page == 1) loadedItems.clear()
+                loadedItems.addAll(mapped)
+
+                adapter.submitList(loadedItems.toList())
+
+                currentPage = page
+
+                if (guides.isEmpty()) {
+                    canLoadMore = false
+                }
+            } catch (e: Exception) {
+                Log.e(logTag, "fetch error page=$page: ${e.message}", e)
+                Toast.makeText(this@GuideActivity, "Gagal memuat guides: ${e.message}", Toast.LENGTH_SHORT).show()
+            } finally {
+                isLoading = false
+            }
+        }
     }
 
     private fun setupBottomNav() {
@@ -96,7 +246,7 @@ class GuideActivity : AppCompatActivity() {
                     R.id.nav_guide -> true
 
                     R.id.nav_contact -> {
-                        startActivity(Intent(this@GuideActivity, ContactUsActivity::class.java))
+                        startActivity(Intent(this@GuideActivity, CalculatorActivity::class.java))
                         finish()
                         true
                     }
@@ -113,25 +263,4 @@ class GuideActivity : AppCompatActivity() {
             startActivity(Intent(this, CustomizeActivity::class.java))
         }
     }
-
-    private fun dummyGuides(): List<GuideArticle> = listOf(
-        GuideArticle(
-            title = "Tentang Vitamin",
-            desc = "Vitamin adalah senyawa penting yang dibutuhkan tubuh dalam jumlah kecil ...",
-            date = "18/10/25",
-            imageRes = R.drawable.guide_img_1
-        ),
-        GuideArticle(
-            title = "Tips Memasak Sehat",
-            desc = "Pelajari cara memasak sehat tanpa kehilangan rasa dan nutrisi ...",
-            date = "18/10/25",
-            imageRes = R.drawable.guide_img_2
-        ),
-        GuideArticle(
-            title = "Panduan Diet Keto",
-            desc = "Diet keto bisa membantu menurunkan berat badan dengan cepat ...",
-            date = "18/10/25",
-            imageRes = R.drawable.guide_img_3
-        )
-    )
 }

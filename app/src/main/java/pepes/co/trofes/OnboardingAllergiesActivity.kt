@@ -2,16 +2,28 @@ package pepes.co.trofes
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.widget.Button
+import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.launch
+import pepes.co.trofes.data.remote.AllergiesApiResponse
+import pepes.co.trofes.data.remote.RetrofitClient
 
 class OnboardingAllergiesActivity : AppCompatActivity() {
+
+    private val logTag = "OnboardingAllergies"
+
+    // mapping tileId -> allergyId
+    private val tileToAllergyId = mutableMapOf<Int, Long>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_onboarding_allergies)
 
-        // Multi select toggle untuk 9 tile (nanti kamu ganti id/isi sesuai kebutuhan)
+        // Multi select toggle untuk 9 tile
         val tileIds = intArrayOf(
             R.id.tile1,
             R.id.tile2,
@@ -30,43 +42,70 @@ class OnboardingAllergiesActivity : AppCompatActivity() {
             }
         }
 
+        // Load dari API untuk mengganti label
+        loadAllergiesAndBind(tileIds)
+
         fun saveSelectedAllergies() {
-            // IntArray tidak selalu punya extension mapNotNull di beberapa konfigurasi; ubah ke List dulu
-            val selected = tileIds.asList().mapNotNull { id ->
+            val selectedIds = tileIds.asList().mapNotNull { id ->
                 val tile = findViewById<android.view.View>(id)
                 if (!tile.isSelected) return@mapNotNull null
-
-                val labelTv = (tile as? android.view.ViewGroup)
-                    ?.let { group ->
-                        (0 until group.childCount)
-                            .map { group.getChildAt(it) }
-                            .firstOrNull { it is android.widget.TextView } as? android.widget.TextView
-                    }
-
-                labelTv?.text?.toString()?.replace("\n", " ")?.trim()?.takeIf { it.isNotBlank() }
+                tileToAllergyId[id]
             }.distinct()
 
             getSharedPreferences("UserProfile", MODE_PRIVATE)
                 .edit()
-                .putString("onboarding_allergies", selected.joinToString("|"))
+                .putString("onboarding_allergy_ids", selectedIds.joinToString("|"))
                 .apply()
         }
 
         fun goNext() {
             saveSelectedAllergies()
-            // lanjut ke Home untuk sekarang (sesuaikan jika flow berubah)
             startActivity(Intent(this, HomeActivity::class.java))
             finish()
         }
 
-        // Tombol di XML onboarding allergies sudah ada (btnContinue/btnSkip) di layout
         val btnContinue = findViewById<Button?>(R.id.btnContinue)
         val btnSkip = findViewById<Button?>(R.id.btnSkip)
 
         btnContinue?.setOnClickListener { goNext() }
-        btnSkip?.setOnClickListener {
-            saveSelectedAllergies()
-            goNext()
+        btnSkip?.setOnClickListener { goNext() }
+    }
+
+    private fun loadAllergiesAndBind(tileIds: IntArray) {
+        lifecycleScope.launch {
+            try {
+                val resp: AllergiesApiResponse = RetrofitClient.apiService.getAllergies(page = 1, perPage = 9)
+                val allergies = resp.data?.allergies?.data
+                    ?: resp.data?.pageData
+                    ?: emptyList()
+
+                val firstNine = allergies.take(9)
+                if (firstNine.isEmpty()) return@launch
+
+                firstNine.forEachIndexed { index, allergy ->
+                    if (index >= tileIds.size) return@forEachIndexed
+
+                    val tileId = tileIds[index]
+                    val tile = findViewById<android.view.View>(tileId)
+                    val label = (allergy.name ?: "").trim()
+                    val id = allergy.allergyId ?: allergy.id
+
+                    if (id != null) tileToAllergyId[tileId] = id
+
+                    if (label.isNotBlank()) {
+                        val tv = (tile as? android.view.ViewGroup)
+                            ?.let { group ->
+                                (0 until group.childCount)
+                                    .map { group.getChildAt(it) }
+                                    .firstOrNull { it is TextView } as? TextView
+                            }
+                        tv?.text = label
+                    }
+                }
+            } catch (e: Exception) {
+                Log.e(logTag, "Failed load allergies: ${e.message}", e)
+                Toast.makeText(this@OnboardingAllergiesActivity, "Gagal memuat allergies, pakai default", Toast.LENGTH_SHORT).show()
+            }
         }
     }
 }

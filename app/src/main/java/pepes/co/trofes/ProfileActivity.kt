@@ -9,8 +9,9 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.button.MaterialButton
+import pepes.co.trofes.auth.BaseAuthActivity
 
-class ProfileActivity : AppCompatActivity() {
+class ProfileActivity : BaseAuthActivity() {
 
     private lateinit var prefs: ProfilePrefs
 
@@ -22,6 +23,8 @@ class ProfileActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        if (isAuthRedirected) return
+
         enableEdgeToEdge()
         setContentView(R.layout.activity_profile)
 

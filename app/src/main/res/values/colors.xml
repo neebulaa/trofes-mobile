@@ -20,4 +20,5 @@
     <color name="trofes_input_bg">#FFFFFF</color>
     <color name="trofes_bg_overlay">#B3000000</color>
     <color name="gray">#A2A2A2</color>
+    <color name="trofes_grey_200">#BDBDBD</color>
 </resources>

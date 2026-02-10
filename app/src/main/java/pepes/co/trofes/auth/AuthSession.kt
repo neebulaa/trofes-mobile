@@ -63,6 +63,13 @@ class AuthSession(context: Context) {
 
         const val EXTRA_AFTER_LOGIN_TARGET = "extra_after_login_target"
         const val TARGET_HOME = "home"
+        const val TARGET_RECIPES = "recipes"
+        const val TARGET_GUIDES = "guides"
+        const val TARGET_CUSTOMIZE = "customize"
+        const val TARGET_CALCULATOR = "calculator"
+        const val TARGET_EDIT_PROFILE = "edit_profile"
+        const val TARGET_CONTACT_US = "contact_us"
+        const val TARGET_CHAT = "chat"
         const val TARGET_RECIPE_DETAIL = "recipe_detail"
         const val TARGET_GUIDE_DETAIL = "guide_detail"
     }

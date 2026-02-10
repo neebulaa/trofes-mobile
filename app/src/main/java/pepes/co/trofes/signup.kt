@@ -142,10 +142,10 @@ class SignupActivity : AppCompatActivity() {
             passwordVisible = !passwordVisible
             if (passwordVisible) {
                 etPassword.inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD
-                ivTogglePassword.setImageResource(R.drawable.ic_eye_on)
+                ivTogglePassword.setImageResource(R.mipmap.ic_eyeon_foreground)
             } else {
                 etPassword.inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD
-                ivTogglePassword.setImageResource(R.drawable.ic_eye_off)
+                ivTogglePassword.setImageResource(R.mipmap.ic_eyeoff_foreground)
             }
             etPassword.setSelection(etPassword.text?.length ?: 0)
         }
@@ -154,10 +154,10 @@ class SignupActivity : AppCompatActivity() {
             confirmPasswordVisible = !confirmPasswordVisible
             if (confirmPasswordVisible) {
                 etConfirm.inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD
-                ivToggleConfirm.setImageResource(R.drawable.ic_eye_on)
+                ivToggleConfirm.setImageResource(R.mipmap.ic_eyeon_foreground)
             } else {
                 etConfirm.inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD
-                ivToggleConfirm.setImageResource(R.drawable.ic_eye_off)
+                ivToggleConfirm.setImageResource(R.mipmap.ic_eyeoff_foreground)
             }
             etConfirm.setSelection(etConfirm.text?.length ?: 0)
         }
@@ -220,6 +220,5 @@ class SignupActivity : AppCompatActivity() {
         return true
     }
 
-    // fungsi lama, dibiarkan (tidak dipakai oleh flow utama)
     private fun isValidPassword(password: String): Boolean = password.length >= 8
 }

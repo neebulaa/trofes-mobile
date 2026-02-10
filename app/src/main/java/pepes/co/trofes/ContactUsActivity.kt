@@ -2,20 +2,21 @@ package pepes.co.trofes
 
 import android.content.Intent
 import android.os.Bundle
-import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
-import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import pepes.co.trofes.auth.BaseAuthActivity
 
-class ContactUsActivity : AppCompatActivity() {
+class ContactUsActivity : BaseAuthActivity() {
 
     private lateinit var adapter: ContactThreadAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        if (isAuthRedirected) return
+
         enableEdgeToEdge()
         setContentView(R.layout.activity_contact_us)
 
@@ -81,7 +82,11 @@ class ContactUsActivity : AppCompatActivity() {
                         true
                     }
 
-                    R.id.nav_contact -> true
+                    R.id.nav_contact -> {
+                        startActivity(Intent(this@ContactUsActivity, CalculatorActivity::class.java))
+                        finish()
+                        true
+                    }
 
                     R.id.nav_placeholder -> false
 
@@ -95,4 +100,6 @@ class ContactUsActivity : AppCompatActivity() {
             startActivity(Intent(this, CustomizeActivity::class.java))
         }
     }
+
+    override fun requiredLoginIntent(): android.content.Intent = SigninIntentFactory.forContactUs(this)
 }

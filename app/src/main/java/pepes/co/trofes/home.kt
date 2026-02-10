@@ -26,6 +26,7 @@ import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import kotlinx.coroutines.launch
 import pepes.co.trofes.auth.AuthSession
+import pepes.co.trofes.auth.requireAuth
 import pepes.co.trofes.home.HomeViewModel
 import pepes.co.trofes.ui.CategoryChipsRow
 import androidx.compose.runtime.mutableStateOf
@@ -63,10 +64,15 @@ class HomeActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        // Wajib login sebelum pakai
+        if (requireAuth()) return
+
         enableEdgeToEdge()
         setContentView(R.layout.activity_home)
 
         authSession = AuthSession(this)
+
 
         // toggle header login/profile
         syncHeaderAuthState()
@@ -92,10 +98,19 @@ class HomeActivity : AppCompatActivity() {
     private fun syncHeaderAuthState() {
         val btnLogin = findViewById<com.google.android.material.button.MaterialButton?>(R.id.btnLogin)
         val ivProfile = findViewById<ImageView?>(R.id.ivProfile)
+        val tvGreeting = findViewById<TextView?>(R.id.tvGreeting)
 
         val loggedIn = authSession.isLoggedIn()
         btnLogin?.visibility = if (loggedIn) View.GONE else View.VISIBLE
         ivProfile?.visibility = if (loggedIn) View.VISIBLE else View.GONE
+
+        // kiri: "Hi {username}"
+        if (loggedIn) {
+            val username = authSession.getUser()?.username?.ifBlank { "" }.orEmpty()
+            tvGreeting?.text = if (username.isNotBlank()) "Hi $username" else "Hi"
+        } else {
+            tvGreeting?.text = "Hi"
+        }
 
         btnLogin?.setOnClickListener {
             startActivity(SigninIntentFactory.forHome(this))
@@ -237,7 +252,7 @@ class HomeActivity : AppCompatActivity() {
                     }
 
                     R.id.nav_contact -> {
-                        startActivity(Intent(this@HomeActivity, ContactUsActivity::class.java))
+                        startActivity(Intent(this@HomeActivity, CalculatorActivity::class.java))
                         true
                     }
 

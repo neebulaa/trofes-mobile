@@ -143,11 +143,11 @@
 
                             <ImageView
                                 android:id="@+id/ivTogglePassword"
-                                android:layout_width="24dp"
-                                android:layout_height="24dp"
+                                android:layout_width="36dp"
+                                android:layout_height="36dp"
                                 android:layout_gravity="end|center_vertical"
                                 android:layout_marginEnd="16dp"
-                                android:src="@drawable/ic_eye_off"
+                                android:src="@mipmap/ic_eyeoff_foreground"
                                 android:contentDescription="Toggle password visibility"
                                 android:clickable="true"
                                 android:focusable="true" />
@@ -181,11 +181,11 @@
 
                             <ImageView
                                 android:id="@+id/ivToggleConfirm"
-                                android:layout_width="24dp"
-                                android:layout_height="24dp"
+                                android:layout_width="36dp"
+                                android:layout_height="36dp"
                                 android:layout_gravity="end|center_vertical"
                                 android:layout_marginEnd="16dp"
-                                android:src="@drawable/ic_eye_off"
+                                android:src="@mipmap/ic_eyeoff_foreground"
                                 android:contentDescription="Toggle confirm password visibility"
                                 android:clickable="true"
                                 android:focusable="true" />

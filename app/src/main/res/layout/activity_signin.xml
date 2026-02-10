@@ -124,11 +124,11 @@
 
                         <ImageView
                             android:id="@+id/ivTogglePassword"
-                            android:layout_width="24dp"
-                            android:layout_height="24dp"
+                            android:layout_width="36dp"
+                            android:layout_height="36dp"
                             android:layout_gravity="end|center_vertical"
                             android:layout_marginEnd="16dp"
-                            android:src="@drawable/ic_eye_off"
+                            android:src="@mipmap/ic_eyeoff_foreground"
                             android:contentDescription="Toggle password visibility"
                             android:clickable="true"
                             android:focusable="true" />
@@ -182,7 +182,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:buttonTint="@color/trofes_green"
-                            android:text="Ingat saya 30 hari kedepan"
+                            android:text="Ingat 30 hari"
                             android:textColor="#1A1A1A"
                             android:textSize="13sp" />
 

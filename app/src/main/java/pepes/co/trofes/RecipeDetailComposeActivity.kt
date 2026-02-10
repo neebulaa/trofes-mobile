@@ -5,6 +5,8 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import pepes.co.trofes.auth.AuthSession
+import pepes.co.trofes.SigninIntentFactory
 import pepes.co.trofes.model.RecipeDetail
 import pepes.co.trofes.ui.recipe.RecipeDetailScreen
 
@@ -12,6 +14,14 @@ class RecipeDetailComposeActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        // Wajib login sebelum pakai (ComponentActivity tidak bisa extend BaseAuthActivity)
+        val session = AuthSession(this)
+        if (!session.isLoggedIn()) {
+            startActivity(SigninIntentFactory.forHome(this))
+            finish()
+            return
+        }
 
         val item = RecommendationItem(
             id = intent.getStringExtra(EXTRA_ID).orEmpty(),

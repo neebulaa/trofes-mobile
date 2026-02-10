@@ -23,6 +23,6 @@
 
     <item
         android:id="@+id/nav_contact"
-        android:icon="@mipmap/ic_contact_us_foreground"
-        android:title="Contact" />
+        android:icon="@mipmap/ic_calculator_foreground"
+        android:title="Calculator" />
 </menu>

@@ -10,9 +10,9 @@ import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
-import androidx.appcompat.app.AppCompatActivity
+import pepes.co.trofes.auth.BaseAuthActivity
 
-class RecipeDetailActivity : AppCompatActivity() {
+class RecipeDetailActivity : BaseAuthActivity() {
 
     companion object {
         const val EXTRA_TITLE = "extra_title"
@@ -33,7 +33,10 @@ class RecipeDetailActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        if (isAuthRedirected) return
+
         enableEdgeToEdge()
+
         setContentView(R.layout.activity_recipe_detail)
 
         findViewById<ImageButton>(R.id.btnBack).setOnClickListener { onBackPressedDispatcher.onBackPressed() }
@@ -136,5 +139,13 @@ class RecipeDetailActivity : AppCompatActivity() {
             web.destroy()
         }
         super.onDestroy()
+    }
+
+    override fun requiredLoginIntent(): android.content.Intent {
+        // Setelah login, SigninActivity akan membuka RecipeDetailActivity dan meneruskan extras ini.
+        return android.content.Intent(this, SigninActivity::class.java).apply {
+            putExtra(pepes.co.trofes.auth.AuthSession.EXTRA_AFTER_LOGIN_TARGET, pepes.co.trofes.auth.AuthSession.TARGET_RECIPE_DETAIL)
+            putExtras(intent.extras ?: Bundle())
+        }
     }
 }
