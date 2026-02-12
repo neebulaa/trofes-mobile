@@ -10,23 +10,43 @@ import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
-import androidx.lifecycle.lifecycleScope
-import kotlinx.coroutines.launch
-import pepes.co.trofes.auth.AuthRepository
+import pepes.co.trofes.auth.AuthRepositoryV1
+import pepes.co.trofes.auth.AuthSession
+import pepes.co.trofes.data.local.TokenManager
+import pepes.co.trofes.data.remote.RetrofitClient
+import pepes.co.trofes.ui.auth.LoginState
+import pepes.co.trofes.ui.auth.LoginViewModel
+import pepes.co.trofes.ui.auth.LoginViewModelFactory
 
 class SignupActivity : AppCompatActivity() {
     private var passwordVisible = false
     private var confirmPasswordVisible = false
 
+    private lateinit var etUsername: EditText
+    private lateinit var etEmail: EditText
+    private lateinit var etPassword: EditText
+    private lateinit var etConfirm: EditText
+    private lateinit var btnSignup: Button
+
+    private val viewModel: LoginViewModel by viewModels {
+        val tokenManager = TokenManager(this)
+        val authSession = AuthSession(this)
+        val repo = AuthRepositoryV1(
+            apiService = RetrofitClient.apiServiceV1,
+            tokenManager = tokenManager,
+            authSession = authSession,
+        )
+        LoginViewModelFactory(repo)
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContentView(R.layout.activity_signup)
-
-        val repo = AuthRepository(this)
 
         // Handle window insets for edge-to-edge display
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(android.R.id.content)) { v, insets ->
@@ -35,13 +55,12 @@ class SignupActivity : AppCompatActivity() {
             insets
         }
 
-        val etUsername = findViewById<EditText>(R.id.etUsername)
-        val etEmail = findViewById<EditText>(R.id.etEmail)
-        val etPassword = findViewById<EditText>(R.id.etPassword)
-        val etConfirm = findViewById<EditText>(R.id.etConfirmPassword)
+        etUsername = findViewById(R.id.etUsername)
+        etEmail = findViewById(R.id.etEmail)
+        etPassword = findViewById(R.id.etPassword)
+        etConfirm = findViewById(R.id.etConfirmPassword)
+        btnSignup = findViewById(R.id.btnSignup)
 
-        // Setup button listeners
-        val btnSignup = findViewById<Button>(R.id.btnSignup)
         btnSignup.setOnClickListener {
             val username = etUsername.text.toString().trim()
             val email = etEmail.text.toString().trim()
@@ -86,51 +105,11 @@ class SignupActivity : AppCompatActivity() {
                 return@setOnClickListener
             }
 
-            lifecycleScope.launch {
-                try {
-                    val res = repo.register(username, email, password, confirm)
-
-                    if (res.success == true && res.data?.token != null && res.data.user != null) {
-                        val user = res.data.user
-                        // auto-login: simpan session
-                        repo.saveSession(
-                            token = res.data.token,
-                            userId = user.id ?: 0L,
-                            username = user.username.orEmpty(),
-                            email = user.email.orEmpty(),
-                            fullName = user.fullName.orEmpty().ifBlank { user.username.orEmpty() },
-                            profileImage = user.profileImage,
-                        )
-
-                        // register berhasil -> onboarding page
-                        startActivity(Intent(this@SignupActivity, Onboarding_Isi_Profile::class.java))
-                        finishAffinity()
-                        return@launch
-                    }
-
-                    val errors = res.errors
-                    if (errors != null) {
-                        errors["username"]?.firstOrNull()?.let { etUsername.error = it }
-                        errors["email"]?.firstOrNull()?.let { etEmail.error = it }
-                        errors["password"]?.firstOrNull()?.let { etPassword.error = it }
-                        errors["password_confirmation"]?.firstOrNull()?.let { etConfirm.error = it }
-
-                        if (etUsername.error == null && etEmail.error == null && etPassword.error == null && etConfirm.error == null) {
-                            Toast.makeText(this@SignupActivity, res.message ?: "Register gagal", Toast.LENGTH_SHORT).show()
-                        }
-                    } else {
-                        Toast.makeText(this@SignupActivity, res.message ?: "Register gagal", Toast.LENGTH_SHORT).show()
-                    }
-                } catch (e: Exception) {
-                    Toast.makeText(this@SignupActivity, "Register gagal: ${e.message}", Toast.LENGTH_SHORT).show()
-                }
-            }
+            viewModel.register(username, email, password, confirm)
         }
 
-        val tvLoginLink = findViewById<TextView>(R.id.tvLoginLink)
-        tvLoginLink.setOnClickListener {
-            val intent = Intent(this, SigninActivity::class.java)
-            startActivity(intent)
+        findViewById<TextView>(R.id.tvLoginLink).setOnClickListener {
+            startActivity(Intent(this, SigninActivity::class.java))
             finish()
         }
 
@@ -162,6 +141,71 @@ class SignupActivity : AppCompatActivity() {
             etConfirm.setSelection(etConfirm.text?.length ?: 0)
         }
 
+        observeRegisterState()
+    }
+
+    private fun observeRegisterState() {
+        viewModel.loginState.observe(this) { state ->
+            when (state) {
+                is LoginState.Loading -> {
+                    btnSignup.isEnabled = false
+                }
+
+                is LoginState.Success -> {
+                    btnSignup.isEnabled = true
+                    Toast.makeText(this, "Register berhasil", Toast.LENGTH_SHORT).show()
+                    // register berhasil -> onboarding page
+                    startActivity(Intent(this, Onboarding_Isi_Profile::class.java))
+                    finishAffinity()
+                }
+
+                is LoginState.Error -> {
+                    btnSignup.isEnabled = true
+                    val applied = applyFieldErrorsIfAny(state.message)
+                    if (!applied) Toast.makeText(this, state.message, Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+    }
+
+    private fun applyFieldErrorsIfAny(rawMessage: String): Boolean {
+        return try {
+            val jsonStart = rawMessage.indexOf('{')
+            if (jsonStart < 0) return false
+
+            val json = org.json.JSONObject(rawMessage.substring(jsonStart))
+            if (!json.has("errors")) return false
+
+            val errors = json.getJSONObject("errors")
+            var applied = false
+
+            fun firstError(key: String): String? {
+                if (!errors.has(key)) return null
+                val arr = errors.optJSONArray(key) ?: return null
+                return arr.optString(0).takeIf { it.isNotBlank() }
+            }
+
+            firstError("username")?.let {
+                etUsername.error = it
+                applied = true
+            }
+            firstError("email")?.let {
+                etEmail.error = it
+                applied = true
+            }
+            firstError("password")?.let {
+                etPassword.error = it
+                applied = true
+            }
+            firstError("password_confirmation")?.let {
+                etConfirm.error = it
+                applied = true
+            }
+
+            applied
+        } catch (_: Exception) {
+            false
+        }
     }
 
     // validateSignupForm() sudah tidak dipakai lagi (diganti api). Biarkan kalau masih dipanggil dari tempat lain.

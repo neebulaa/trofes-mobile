@@ -3,7 +3,6 @@ package pepes.co.trofes.data.remote
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import pepes.co.trofes.BuildConfig
-import pepes.co.trofes.auth.AuthSession
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
@@ -30,12 +29,21 @@ object RetrofitClient {
         .addInterceptor(loggingInterceptor)
         .build()
 
-    val apiService: ApiService by lazy {
+    private val retrofit: Retrofit by lazy {
         Retrofit.Builder()
             .baseUrl(BASE_URL)
             .client(okHttpClient)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
-            .create(ApiService::class.java)
+    }
+
+    /** API service existing (dipakai screen yang sudah ada sekarang). */
+    val apiService: ApiService by lazy {
+        retrofit.create(ApiService::class.java)
+    }
+
+    /** API service versi v1 (endpoint lengkap + Response<ApiResponse<...>>). */
+    val apiServiceV1: ApiServiceV1 by lazy {
+        retrofit.create(ApiServiceV1::class.java)
     }
 }

@@ -103,15 +103,24 @@ dependencies {
     implementation("androidx.camera:camera-view:$cameraxVersion")
 
     // Networking (Retrofit)
-    implementation("com.squareup.retrofit2:retrofit:2.11.0")
-    implementation("com.squareup.retrofit2:converter-gson:2.11.0")
-    implementation("com.squareup.okhttp3:logging-interceptor:4.12.0")
+    // (pakai version catalog)
+    implementation(libs.retrofit)
+    implementation(libs.retrofit.converter.gson)
+    implementation(libs.okhttp.logging.interceptor)
 
-    // ViewModel + Coroutines scope
-    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.8.7")
+    // Kotlin Coroutines
+    implementation(libs.kotlinx.coroutines.android)
+    implementation(libs.kotlinx.coroutines.core)
 
-    // Image loading (URL -> ImageView)
-    implementation("io.coil-kt:coil:2.6.0")
+    // ViewModel & LiveData
+    implementation(libs.androidx.lifecycle.viewmodel.ktx)
+    implementation(libs.androidx.lifecycle.livedata.ktx)
+
+    // DataStore untuk menyimpan token
+    implementation(libs.androidx.datastore.preferences)
+
+    // Coil untuk loading image
+    implementation(libs.coil)
 
     // Google Sign-In
     implementation("com.google.android.gms:play-services-auth:21.2.0")

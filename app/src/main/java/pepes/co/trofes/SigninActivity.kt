@@ -4,6 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.text.InputType
 import android.util.Patterns
+import android.view.View
 import android.widget.Button
 import android.widget.CheckBox
 import android.widget.EditText
@@ -11,21 +12,39 @@ import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.lifecycleScope
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
-import kotlinx.coroutines.launch
-import pepes.co.trofes.auth.AuthRepository
+import pepes.co.trofes.auth.AuthRepositoryV1
 import pepes.co.trofes.auth.AuthSession
+import pepes.co.trofes.data.local.TokenManager
+import pepes.co.trofes.data.remote.RetrofitClient
+import pepes.co.trofes.ui.auth.LoginState
+import pepes.co.trofes.ui.auth.LoginViewModel
+import pepes.co.trofes.ui.auth.LoginViewModelFactory
 
 class SigninActivity : AppCompatActivity() {
 
     private var passwordVisible = false
 
-    private lateinit var repo: AuthRepository
+    private lateinit var etEmail: EditText
+    private lateinit var etPassword: EditText
+    private lateinit var btnSignin: Button
+    private lateinit var btnGoogle: Button
+
+    private val viewModel: LoginViewModel by viewModels {
+        val tokenManager = TokenManager(this)
+        val authSession = AuthSession(this)
+        val repo = AuthRepositoryV1(
+            apiService = RetrofitClient.apiServiceV1,
+            tokenManager = tokenManager,
+            authSession = authSession,
+        )
+        LoginViewModelFactory(repo)
+    }
 
     private val googleLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
         try {
@@ -41,10 +60,10 @@ class SigninActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_signin)
 
-        repo = AuthRepository(this)
-
-        val etEmail = findViewById<EditText>(R.id.etEmail)
-        val etPassword = findViewById<EditText>(R.id.etPassword)
+        etEmail = findViewById(R.id.etEmail)
+        etPassword = findViewById(R.id.etPassword)
+        btnSignin = findViewById(R.id.btnSignin)
+        btnGoogle = findViewById(R.id.btnGoogle)
 
         val ivTogglePassword = findViewById<ImageView>(R.id.ivTogglePassword)
         ivTogglePassword.setOnClickListener {
@@ -63,11 +82,11 @@ class SigninActivity : AppCompatActivity() {
             Toast.makeText(this, "Fitur lupa password belum dibuat", Toast.LENGTH_SHORT).show()
         }
 
-        findViewById<Button>(R.id.btnGoogle).setOnClickListener {
+        btnGoogle.setOnClickListener {
             startGoogleSignIn()
         }
 
-        findViewById<Button>(R.id.btnSignin).setOnClickListener {
+        btnSignin.setOnClickListener {
             val emailOrUsername = etEmail.text.toString().trim()
             val password = etPassword.text.toString()
 
@@ -95,87 +114,92 @@ class SigninActivity : AppCompatActivity() {
             // Remember checkbox (placeholder)
             findViewById<CheckBox>(R.id.cbRemember).isChecked
 
-            lifecycleScope.launch {
-                try {
-                    val res = repo.login(emailOrUsername, password)
-
-                    if (res.success == true && res.data?.token != null && res.data.user != null) {
-                        saveSessionAndRedirect(res.data.token, res.data.user)
-                        return@launch
-                    }
-
-                    // Failed: tampilkan error sesuai API
-                    val errors = res.errors
-                    if (errors != null) {
-                        // Login API biasanya kirim error di field 'login' atau 'password'
-                        errors["login"]?.firstOrNull()?.let { etEmail.error = it }
-                        errors["email"]?.firstOrNull()?.let { etEmail.error = it }
-                        errors["username"]?.firstOrNull()?.let { etEmail.error = it }
-                        errors["password"]?.firstOrNull()?.let { etPassword.error = it }
-
-                        if (etEmail.error == null && etPassword.error == null) {
-                            Toast.makeText(this@SigninActivity, res.message ?: "Login gagal", Toast.LENGTH_SHORT).show()
-                        }
-                    } else {
-                        Toast.makeText(this@SigninActivity, res.message ?: "Login gagal", Toast.LENGTH_SHORT).show()
-                    }
-                } catch (e: Exception) {
-                    Toast.makeText(this@SigninActivity, "Login gagal: ${e.message}", Toast.LENGTH_SHORT).show()
-                }
-            }
+            viewModel.login(emailOrUsername, password)
         }
 
         findViewById<TextView>(R.id.tvSignupLink).setOnClickListener {
             startActivity(Intent(this, SignupActivity::class.java))
         }
+
+        observeLoginState()
     }
 
-    private fun startGoogleSignIn() {
-        // TODO: isi client id via local.properties/BuildConfig kalau diperlukan.
-        // Untuk sementara: gunakan default requestIdToken (harus diisi WEB_CLIENT_ID agar dapat token).
-        val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-            .requestEmail()
-            .requestIdToken(getString(R.string.default_web_client_id))
-            .build()
-
-        val client = GoogleSignIn.getClient(this, gso)
-        googleLauncher.launch(client.signInIntent)
-    }
-
-    private fun handleGoogleAccount(account: GoogleSignInAccount?) {
-        val idToken = account?.idToken
-        if (idToken.isNullOrBlank()) {
-            Toast.makeText(this, "Google ID token kosong. Pastikan default_web_client_id sudah benar.", Toast.LENGTH_LONG).show()
-            return
-        }
-
-        lifecycleScope.launch {
-            try {
-                val res = repo.googleLogin(idToken)
-                if (res.success == true && res.data?.token != null && res.data.user != null) {
-                    saveSessionAndRedirect(res.data.token, res.data.user)
-                    return@launch
+    private fun observeLoginState() {
+        viewModel.loginState.observe(this) { state ->
+            when (state) {
+                is LoginState.Loading -> {
+                    btnSignin.isEnabled = false
+                    btnGoogle.isEnabled = false
                 }
 
-                val googleErr = res.errors?.get("google")?.firstOrNull()
-                Toast.makeText(this@SigninActivity, googleErr ?: res.message ?: "Google login gagal", Toast.LENGTH_SHORT).show()
-            } catch (e: Exception) {
-                Toast.makeText(this@SigninActivity, "Google login gagal: ${e.message}", Toast.LENGTH_SHORT).show()
+                is LoginState.Success -> {
+                    btnSignin.isEnabled = true
+                    btnGoogle.isEnabled = true
+
+                    Toast.makeText(this, "Login berhasil", Toast.LENGTH_SHORT).show()
+                    redirectAfterLogin(state.authResponse.user.onboardingCompleted)
+                }
+
+                is LoginState.Error -> {
+                    btnSignin.isEnabled = true
+                    btnGoogle.isEnabled = true
+
+                    // Coba mapping error per-field kalau backend mengirim { errors: { login: [...], password: [...] } }
+                    val applied = applyFieldErrorsIfAny(state.message)
+                    if (!applied) {
+                        Toast.makeText(this, state.message, Toast.LENGTH_SHORT).show()
+                    }
+                }
             }
         }
     }
 
-    private fun saveSessionAndRedirect(token: String, user: pepes.co.trofes.data.remote.ApiUser) {
-        repo.saveSession(
-            token = token,
-            userId = user.id ?: 0L,
-            username = user.username.orEmpty(),
-            email = user.email.orEmpty(),
-            fullName = user.fullName.orEmpty().ifBlank { user.username.orEmpty() },
-            profileImage = user.profileImage,
-        )
+    private fun applyFieldErrorsIfAny(rawMessage: String): Boolean {
+        return try {
+            val jsonStart = rawMessage.indexOf('{')
+            if (jsonStart < 0) return false
 
-        // redirect target
+            val json = org.json.JSONObject(rawMessage.substring(jsonStart))
+            if (!json.has("errors")) return false
+
+            val errors = json.getJSONObject("errors")
+            var applied = false
+
+            fun firstError(key: String): String? {
+                if (!errors.has(key)) return null
+                val arr = errors.optJSONArray(key) ?: return null
+                return arr.optString(0).takeIf { it.isNotBlank() }
+            }
+
+            val loginErr = firstError("login") ?: firstError("email") ?: firstError("username")
+            val passErr = firstError("password")
+
+            if (!loginErr.isNullOrBlank()) {
+                etEmail.error = loginErr
+                applied = true
+            }
+            if (!passErr.isNullOrBlank()) {
+                etPassword.error = passErr
+                applied = true
+            }
+
+            applied
+        } catch (_: Exception) {
+            false
+        }
+    }
+
+    private fun redirectAfterLogin(onboardingCompleted: Boolean) {
+        // Kalau onboarding belum selesai, arahkan ke onboarding flow.
+        // Kalau belum ada activity onboarding yang pas, fallback ke Home.
+        if (!onboardingCompleted) {
+            // TODO: arahkan ke activity onboarding yang sesuai (sesuaikan dengan flow project kamu)
+            startActivity(Intent(this, OnboardingMobileActivity::class.java))
+            finishAffinity()
+            return
+        }
+
+        // redirect target (tetap sama seperti implementasi lama)
         val target = intent.getStringExtra(AuthSession.EXTRA_AFTER_LOGIN_TARGET)
         when (target) {
             AuthSession.TARGET_RECIPE_DETAIL -> {
@@ -247,8 +271,28 @@ class SigninActivity : AppCompatActivity() {
             }
         }
 
-        // fallback: kalau tidak ada target, jangan memaksa Home. Pakai Home sebagai default aman.
+        // fallback
         startActivity(Intent(this, HomeActivity::class.java))
         finishAffinity()
+    }
+
+    private fun startGoogleSignIn() {
+        val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+            .requestEmail()
+            .requestIdToken(getString(R.string.default_web_client_id))
+            .build()
+
+        val client = GoogleSignIn.getClient(this, gso)
+        googleLauncher.launch(client.signInIntent)
+    }
+
+    private fun handleGoogleAccount(account: GoogleSignInAccount?) {
+        val idToken = account?.idToken
+        if (idToken.isNullOrBlank()) {
+            Toast.makeText(this, "Google ID token kosong. Pastikan default_web_client_id sudah benar.", Toast.LENGTH_LONG).show()
+            return
+        }
+
+        viewModel.googleLogin(idToken)
     }
 }
